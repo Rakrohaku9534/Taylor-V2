@@ -1124,6 +1124,7 @@ export async function handler(chatUpdate) {
                 continue
             if ((usedPrefix = (match[0] || "")[0])) {
                 let noPrefix = m.text.replace(usedPrefix, "")
+                let args_v2 = m.text.slice(usedPrefix.length).trim().split(/ +/)
                 let [command, ...args] = noPrefix.trim().split` `.filter(v => v)
                 args = args || []
                 let _args = noPrefix.trim().split` `.slice(1)
@@ -1147,9 +1148,15 @@ export async function handler(chatUpdate) {
                 if (m.chat in global.db.data.chats || m.sender in global.db.data.users) {
                     let chat = global.db.data.chats[m.chat]
                     let user = global.db.data.users[m.sender]
-                    if (name != "owner-unbanchat.js" && chat?.isBanned)
+                    if (
+                        name != "./plugins/Owner/owner-unbanchat.js" &&
+                        name != "./plugins/Owner/owner-exec.js" &&
+                        name != "./plugins/Owner/owner-exec2.js" &&
+                        name != "./plugins/Owner/tools-delete.js" &&
+                        chat?.isBanned
+                    )
                         return // Except this
-                    if (name != "owner-unbanuser.js" && user?.banned)
+                    if (name != "./plugins/Owner/owner-unbanuser.js" && user?.banned)
                         return
                 }
                 if (plugin.rowner && plugin.owner && !(isROwner || isOwner)) { // Both Owner
@@ -1225,6 +1232,7 @@ export async function handler(chatUpdate) {
                     noPrefix,
                     _args,
                     args,
+                    args_v2,
                     command,
                     text,
                     conn: this,
@@ -1381,23 +1389,37 @@ export async function participantsUpdate({
         case "promote":
             const promoteText = (chat.sPromote || this.spromote || conn.spromote || `${emoji.promote} @user *telah diangkat menjadi Admin*`).replace("@user", "@" + participants[0].split("@")[0]);
             if (chat.detect) {
-                this.sendMessage(id, {
-                    text: promoteText.trim(),
-                    mentions: [participants[0]]
-                }, {
-                    quoted: fakes
-                });
+                this.reply(
+                    id,
+                    promoteText.trim(),
+                    fakes, {
+                        contextInfo: {
+                            mentionedJid: [participants[0]],
+                            externalAdReply: {
+                                title: "Promote",
+                                thumbnail: await(await this.getFile("https://cdn-icons-png.flaticon.com/128/1828/1828861.png")).data
+                            },
+                        },
+                    }
+                )
             }
             break;
         case "demote":
             const demoteText = (chat.sDemote || this.sdemote || conn.sdemote || `${emoji.demote} @user *tidak lagi menjadi Admin*`).replace("@user", "@" + participants[0].split("@")[0]);
             if (chat.detect) {
-                this.sendMessage(id, {
-                    text: demoteText.trim(),
-                    mentions: [participants[0]]
-                }, {
-                    quoted: fakes
-                });
+                this.reply(
+                    id,
+                    demoteText.trim(),
+                    null, {
+                        contextInfo: {
+                            mentionedJid: [participants[0]],
+                            externalAdReply: {
+                                title: "Demote",
+                                thumbnail: await(await this.getFile("https://cdn-icons-png.flaticon.com/128/1828/1828856.png")).data
+                            },
+                        },
+                    }
+                )
             }
             break;
     }
@@ -1451,12 +1473,19 @@ export async function groupsUpdate(groupsUpdate) {
         }
 
         if (!text) continue
-        this.sendMessage(id, {
-            text: text.trim(),
-            mentions: []
-        }, {
-            quoted: fakes
-        })
+        this.reply(
+            id,
+            text.trim(),
+            fakes, {
+                contextInfo: {
+                    mentionedJid: [],
+                    externalAdReply: {
+                        title: "Updated Setting",
+                        thumbnail: await(await this.getFile("https://cdn-icons-png.flaticon.com/128/6542/6542976.png")).data
+                    },
+                },
+            }
+        )
     }
 }
 
@@ -1478,12 +1507,19 @@ export async function deleteUpdate(message) {
         let chat = global.db.data.chats[msg.chat] || {}
         if (chat.antiDelete)
             return
-        this.sendMessage(msg.key.remoteJid, {
-            text: `❗ Terdeteksi @${participant.split`@`[0]} telah menghapus pesan.\nUntuk mematikan fitur ini, ketik\n*.off antidelete*\n\nUntuk menghapus pesan yang dikirim BOT, reply pesan dengan perintah\n*.delete*`,
-            mentions: [participant]
-        }, {
-            quoted: msg
-        })
+        this.reply(
+            msg.key.remoteJid,
+            `❗ Terdeteksi @${participant.split`@`[0]} telah menghapus pesan.\nUntuk mematikan fitur ini, ketik\n*.off antidelete*\n\nUntuk menghapus pesan yang dikirim BOT, reply pesan dengan perintah\n*.delete*`,
+            msg, {
+                contextInfo: {
+                    mentionedJid: [participant],
+                    externalAdReply: {
+                        title: "Deleted Message",
+                        thumbnail: await(await this.getFile("https://cdn-icons-png.flaticon.com/128/6861/6861362.png")).data
+                    },
+                },
+            }
+        )
         this.copyNForward(msg.chat, msg, false).catch(e => console.log(e, msg))
     } catch (e) {
         console.error(e)
@@ -1494,21 +1530,25 @@ export async function deleteUpdate(message) {
  Polling Update 
 */
 export async function pollUpdate(message) {
-  for (const { key, update } of message) {
-            if (message.pollUpdates) {
-                const pollCreation = await this.serializeM(this.loadMessage(key.id))
-                if (pollCreation) {
-                    const pollMessage = await getAggregateVotesInPollMessage({
-                        message: pollCreation.message,
-                        pollUpdates: pollCreation.pollUpdates,
-                    })
-                    message.pollUpdates[0].vote = pollMessage
-                    
-                    await console.log(pollMessage)
-                    this.appenTextMessage(message, message.pollUpdates[0].vote || pollMessage.filter((v) => v.voters.length !== 0)[0]?.name, message.message);
-                }
+    for (const {
+            key,
+            update
+        }
+        of message) {
+        if (message.pollUpdates) {
+            const pollCreation = await this.serializeM(this.loadMessage(key.id))
+            if (pollCreation) {
+                const pollMessage = await getAggregateVotesInPollMessage({
+                    message: pollCreation.message,
+                    pollUpdates: pollCreation.pollUpdates,
+                })
+                message.pollUpdates[0].vote = pollMessage
+
+                await console.log(pollMessage)
+                this.appenTextMessage(message, message.pollUpdates[0].vote || pollMessage.filter((v) => v.voters.length !== 0)[0]?.name, message.message);
             }
         }
+    }
 }
 
 /*
@@ -1534,9 +1574,19 @@ export async function presenceUpdate(presenceUpdate) {
       user.afkReason ? user.afkReason : "No Reason"
     }\nSelama ${timeAfk.toTimeString()} Yang Lalu\n`;
 
-        this.reply(id, caption, null, {
-            mentions: this.parseMention(caption)
-        });
+        this.reply(
+            id,
+            caption,
+            null, {
+                contextInfo: {
+                    mentionedJid: [username],
+                    externalAdReply: {
+                        title: "AFK Stopped",
+                        thumbnail: await(await this.getFile("https://cdn-icons-png.flaticon.com/128/2576/2576762.png")).data
+                    },
+                },
+            }
+        )
         user.afk = -1;
         user.afkReason = "";
     }
@@ -1546,8 +1596,8 @@ export async function presenceUpdate(presenceUpdate) {
 /**
 dfail
  */
-global.dfail = (type, m, conn) => {
-    const userTag = `👋 Hai *@${m.sender.split("@")[0]}*, `
+global.dfail = async (type, m, conn) => {
+    const userTag = `👋 Hai @${m.sender.split("@")[0]}\n`
     const emoji = {
         general: '⚙️',
         owner: '👑',
@@ -1587,12 +1637,19 @@ ${userTag} RPG tidak aktif, Silahkan hubungi Team Bot Discussion Untuk mengaktif
         restrict: `*${emoji.restrict} ᴘᴇʀʜᴀᴛɪᴀɴ ᴛɪᴅᴀᴋ ᴀᴋᴛɪꜰ*\n
 ${userTag} Fitur ini di *disable* !`,
     } [type]
-    if (msg) return conn.sendMessage(m.chat, {
-        text: msg,
-        mentions: conn.parseMention(msg)
-    }, {
-        quoted: m
-    })
+    if (msg) return conn.reply(
+        m.chat,
+        msg,
+        m, {
+            contextInfo: {
+                mentionedJid: [m.sender],
+                externalAdReply: {
+                    title: "Access Denied",
+                    thumbnail: await(await conn.getFile("https://cdn-icons-png.flaticon.com/128/9667/9667923.png")).data
+                },
+            },
+        }
+    )
 
 }
 
