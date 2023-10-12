@@ -32,7 +32,7 @@ let handler = async (m, { conn, isROwner, usedPrefix, command, text }) => {
       await m.reply(errorMessage);
     }
   } else {
-    const notFoundMessage = `Input ${input} tidak ditemukan dalam array. Berikut adalah daftar dengan nomor urutan:\n${array.map((item, i) => `${i + 1}. ${item}`).join('\n')}\nContoh penggunaan: Untuk mencari bagian, ketik *.gp anti-audio*`;
+    const notFoundMessage = `Input ${input} tidak ditemukan dalam array. Berikut adalah daftar dengan nomor urutan:\n${array.map(item => item.split("/").pop().replace(".js", "")).map((item, i) => `${i + 1}. ${item}`).join('\n')}\nContoh penggunaan: Untuk mencari bagian, ketik *.gp anti-audio*`;
     await m.reply(notFoundMessage);
   }
 }
