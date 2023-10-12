@@ -38,9 +38,6 @@ import {
 
 import yargs from 'yargs';
 import {
-    promisify
-} from 'util';
-import {
     spawn
 } from 'child_process';
 import lodash from 'lodash';
@@ -52,7 +49,8 @@ import {
 import chokidar from 'chokidar';
 import glob from 'glob';
 import {
-    format
+    format,
+    promisify
 } from 'util';
 import {
     Boom
