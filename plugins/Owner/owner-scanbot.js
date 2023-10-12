@@ -5,7 +5,7 @@ import { makeWaSocket, protoType, serialize } from '../../lib/simple.js';
 import store from '../../lib/store-single.js';
 import fs from 'fs'
 import { createRequire } from 'module'
-const { groupsUpdate } = await(await import('../handler.js'))
+const { groupsUpdate } = await(await import('../../handler.js'))
 /*
 const imports = (path) => {
  path = createRequire.resolve(path)
