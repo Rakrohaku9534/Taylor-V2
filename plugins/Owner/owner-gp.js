@@ -1,25 +1,42 @@
-import cp, { exec as _exec } from 'child_process'
-import { promisify } from 'util'
-let exec = promisify(_exec).bind(cp)
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
 let handler = async (m, { conn, isROwner, usedPrefix, command, text }) => {
-await m.reply(global.wait)
-    if (!isROwner) return
-    let ar = Object.keys(plugins)
-    let ar1 = ar.map(v => v.replace('.js', ''))
-    if (!text) throw `uhm.. where the text?\n\nexample:\n${usedPrefix + command} info`
-    if (!ar1.includes(text)) return m.reply(`*🗃️ NOT FOUND!*\n==================================\n\n${ar1.map(v => ' ' + v).join`\n`}`)
-    let o
+  // Menunggu pesan "global.wait" sebelum melanjutkan
+  await m.reply(global.wait);
+
+  // Memeriksa apakah pengguna adalah pemilik bot
+  if (!isROwner) return;
+
+  // Mendapatkan daftar plugin
+  const array = Object.keys(plugins);
+  const execAsync = promisify(exec);
+  const input = text;
+
+  // Validasi input untuk menghindari karakter khusus atau instruksi berbahaya
+  if (!/^[a-zA-Z0-9-_.]+$/.test(input)) {
+    await m.reply("Input tidak valid. Harap gunakan karakter yang aman.");
+    return;
+  }
+
+  const index = array.findIndex(item => item.includes(input));
+
+  if (index !== -1) {
+    const fileToCat = array[index];
     try {
-        o = await exec('cat plugins/' + text + '.js')
-    } catch (e) {
-        o = e
-    } finally {
-        let { stdout, stderr } = o
-        if (stdout.trim()) m.reply(stdout)
-        if (stderr.trim()) m.reply(stderr)
+      const { stdout, stderr } = await execAsync(`cat ${fileToCat}`);
+      const output = stdout || stderr;
+      await m.reply(output);
+    } catch (error) {
+      const errorMessage = `Terjadi kesalahan: ${error.message}`;
+      await m.reply(errorMessage);
     }
+  } else {
+    const notFoundMessage = `Input ${input} tidak ditemukan dalam array. Berikut adalah daftar dengan nomor urutan:\n${array.map((item, i) => `${i + 1}. ${item}`).join('\n')}\nContoh penggunaan: Untuk mencari bagian, ketik *.gp anti-audio*`;
+    await m.reply(notFoundMessage);
+  }
 }
+
 handler.help = ['getplugin'].map(v => v + ' <text>')
 handler.tags = ['owner']
 handler.command = /^(getplugin|gp)$/i

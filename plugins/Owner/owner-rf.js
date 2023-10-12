@@ -1,41 +1,45 @@
-import { tmpdir } from 'os'
-import path, { join } from 'path'
-import {
-  readdirSync,
-  statSync,
-  unlinkSync,
-  existsSync,
-  readFileSync,
-  watch,
-  renameSync
-} from 'fs'
-let handler = async (m, { args, text, usedPrefix, command }) => {
-	let info = `${usedPrefix + command} <old name> | <new name>
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
-• example:
-➞ ${usedPrefix + command} inv | rpg-inv
+let handler = async (m, { conn, isROwner, usedPrefix, command, text }) => {
+  // Menunggu pesan "global.wait" sebelum melanjutkan
+  await m.reply(global.wait);
 
-• Note:
-Harap tidak memakai kata .js diakhir kalimat
-harap tidak menggunakan spasi diantar nama file, seperti "rpg- inv"`
-if (!args[0]) throw info
-if (!args[1] == "|") throw `• example:
-➞ ${usedPrefix + command} inv | rpg-inv`
-if (!args[2]) throw `• example:
-➞ ${usedPrefix + command} inv | rpg-inv`
+  // Memeriksa apakah pengguna adalah pemilik bot
+  if (!isROwner) return;
 
-let from = args[0]
-let to = args[2]
+  // Mendapatkan daftar plugin
+  const array = Object.keys(plugins);
+  const execAsync = promisify(exec);
+  let [input, destination] = text.split(' ');
 
-let ar = Object.keys(plugins)
-    let ar1 = ar.map(v => v.replace('.js', ''))
-    if (!ar1.includes(args[0])) return m.reply(`*🗃️ NOT FOUND!*\n==================================\n\n${ar1.map(v => ' ' + v).join`\n`}`)
-await renameSync(`./plugins/${from}.js`, `./plugins/${to}.js`)
-conn.reply(m.chat, `Succes changes "plugins/${from}.js" to "plugins/${to}.js"`, m)
-    
+  // Validasi input untuk menghindari karakter khusus atau instruksi berbahaya
+  if (!/^[a-zA-Z0-9-_.]+$/.test(input)) {
+    await m.reply("Input tidak valid. Harap gunakan karakter yang aman.");
+    return;
+  }
+
+  const index = array.findIndex(item => item.includes(input));
+
+  if (index !== -1) {
+    const fileToCat = array[index];
+    try {
+      const { stdout, stderr } = await execAsync(`mv ${fileToCat} ${destination}`);
+      const output = stdout || stderr;
+      await m.reply(output);
+    } catch (error) {
+      const errorMessage = `Terjadi kesalahan: ${error.message}`;
+      await m.reply(errorMessage);
+    }
+  } else {
+    const notFoundMessage = `Input ${input} tidak ditemukan dalam array. Berikut adalah daftar dengan nomor urutan:\n${array.map((item, i) => `${i + 1}. ${item}`).join('\n')}\nContoh penggunaan: Untuk mencari bagian, ketik *.rf anti-audio*`;
+    await m.reply(notFoundMessage);
+  }
 }
-handler.help = ['rf','renamefile'].map(_=> _ + " <old name> | <new name>")
+
+handler.help = ['rfplugin'].map(v => v + ' <text>')
 handler.tags = ['owner']
-handler.command = /^(r(ename(file)?|f))$/i
-handler.owner = true
+handler.command = /^(rfplugin|rf)$/i
+handler.rowner = true
+
 export default handler

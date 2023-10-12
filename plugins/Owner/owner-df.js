@@ -1,34 +1,45 @@
-import { tmpdir } from 'os'
-import path, { join } from 'path'
-import {
-  readdirSync,
-  statSync,
-  unlinkSync,
-  existsSync,
-  readFileSync,
-  watch
-} from 'fs'
-let handler = async (m, { conn, usedPrefix: _p, __dirname, args, text }) => {
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
-let ar = Object.keys(plugins)
-let ar1 = ar.map(v => v.replace('.js', ''))
-let spas = "                "
-    let listSections = []
-    Object.keys(ar1).map((v, index) => {
-	listSections.push([spas + "[ RESULT " + ++index + " ]", [
-          [ar1[v].toUpperCase(), "/df " + ar1[v], "To Deleted"]
-        ]])
-        })
-	if (!text) return conn.sendList(m.chat, "*[ REMOVE PLUGINS ]*", "⚡ Silakan pilih PLUGINS yang ingin di hapus...", author, "☂️ SELECT ☂️", listSections, m)
-    if (!ar1.includes(args[0])) return m.reply(`*🗃️ NOT FOUND!*\n==================================\n\n${ar1.map(v => ' ' + v).join`\n`}`)
-const file = join(__dirname, '../plugins/' + args[0] + '.js')
-unlinkSync(file)
-conn.reply(m.chat, `Succes deleted "plugins/${args[0]}.js"`, m)
-    
+let handler = async (m, { conn, isROwner, usedPrefix, command, text }) => {
+  // Menunggu pesan "global.wait" sebelum melanjutkan
+  await m.reply(global.wait);
+
+  // Memeriksa apakah pengguna adalah pemilik bot
+  if (!isROwner) return;
+
+  // Mendapatkan daftar plugin
+  const array = Object.keys(plugins);
+  const execAsync = promisify(exec);
+  const input = text;
+
+  // Validasi input untuk menghindari karakter khusus atau instruksi berbahaya
+  if (!/^[a-zA-Z0-9-_.]+$/.test(input)) {
+    await m.reply("Input tidak valid. Harap gunakan karakter yang aman.");
+    return;
+  }
+
+  const index = array.findIndex(item => item.includes(input));
+
+  if (index !== -1) {
+    const fileToCat = array[index];
+    try {
+      const { stdout, stderr } = await execAsync(`rm -rf ${fileToCat}`);
+      const output = stdout || stderr;
+      await m.reply(output);
+    } catch (error) {
+      const errorMessage = `Terjadi kesalahan: ${error.message}`;
+      await m.reply(errorMessage);
+    }
+  } else {
+    const notFoundMessage = `Input ${input} tidak ditemukan dalam array. Berikut adalah daftar dengan nomor urutan:\n${array.map((item, i) => `${i + 1}. ${item}`).join('\n')}\nContoh penggunaan: Untuk mencari bagian, ketik *.df anti-audio*`;
+    await m.reply(notFoundMessage);
+  }
 }
-handler.help = ['df']
+
+handler.help = ['dfplugin'].map(v => v + ' <text>')
 handler.tags = ['owner']
-handler.command = /^(df)$/i
-handler.owner = true
+handler.command = /^(dfplugin|df)$/i
+handler.rowner = true
 
 export default handler
