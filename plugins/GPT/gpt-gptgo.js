@@ -11,10 +11,8 @@ let handler = async (m, {
 if (!text) return m.reply("Input query\nExample: .gptgo hello")
 await m.reply(wait)
 try {
-// Contoh penggunaan
-let input = await gptGo(text)
-let result = input.content
-await m.reply(convertNewline(result))
+let result = await gptGo(text)
+await m.reply(result)
 } catch (e) {
 await m.reply(eror)
 }
@@ -23,11 +21,6 @@ handler.help = ["gptgo"]
 handler.tags = ["internet", "ai", "gpt"];
 handler.command = /^(gptgo)$/i
 export default handler
-
-function convertNewline(output) {
-  const convertedOutput = output.replace(/\\n/g, '\n');
-  return convertedOutput;
-}
 
 /* New Line */
 async function gptGo(query) {
@@ -50,22 +43,14 @@ async function gptGo(query) {
     }
   });
 
-  const inputText = await response.text();
-  const arrays = inputText.split('\n');
-  const result = arrays.reduce((acc, item) => {
-    const match = item.match(/"content":"([^"]+)"/);
-    if (match) {
-      const content = match[1];
-      acc.push(content);
-    }
-    return acc;
-  }, []);
+  const result = (await response.text())
+  .split('\n')
+  .filter(line => line.trim() !== '')
+  .map(line => line.replace('data: ', ''))
+  .slice(0, -2)
+  .map(item => JSON.parse(item))
+  .map(v => v.choices[0].delta.content)
+  .join('');
 
-  // Menghapus elemen terakhir dari array result
-  if (result.length > 0) {
-    result.pop();
-  }
-
-  const mergedContent = { content: result.join('') };
-  return mergedContent;
+return result;
 }
