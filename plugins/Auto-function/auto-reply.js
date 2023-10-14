@@ -18,6 +18,18 @@ if (mtype === 'reactionMessage') {
     reactCaption = `🎭 *Terdeteksi* @${name} ${action} ${message}`;
 }
 
+if (mtype === 'editedMessage') {
+    try {
+    console.log(mtype);
+    const tittle_edit = `*Edited Message* @${m.sender.split('@')[0]}`
+    const message_edit = this.loadMessage(m.id).message.editedMessage.message.protocolMessage.editedMessage.extendedTextMessage.text
+    const quoted_edit = this.loadMessage(this.loadMessage(m.id).message.editedMessage.message.protocolMessage.key.id)
+    return this.sendMessage(m.chat, { text: `${tittle_edit}\n\n${message_edit}`, mentions: [m.sender] }, { quoted: quoted_edit });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
 const messages = {
     reactionMessage: reactCaption,
     paymentMessage: `💸 *Terdeteksi* @${name} Lagi Meminta Uang`,

@@ -1,27 +1,29 @@
 import fetch from 'node-fetch';
 
 export async function before(m) {
-  this.autogpt = this.autogpt ? this.autogpt : {};
-  if (m.isBaileys || !this.autogpt.status || !m.text) return false;
-  let text = m.text;
-  if (text) {
-    try {
-      if (text.includes('gpt') || text.includes('chatgpt')) {
-        const startIdx = Math.max(text.indexOf('gpt'), text.indexOf('chatgpt')) + 2;
-        const inputText = text.substring(startIdx).trim();
-        const result = await gptGo(inputText)
+    const chat = global.db.data.chats[m.chat];
+    if (m.isBaileys || !m.text) return false;
+    let text = m.text;
+  try {
+        if (chat.autochatGpt) {
+            const openAIResponse = await gptGo(text)
+            const result = openAIResponse;
+            
             if (result) {
-                await this.reply(m.chat, result, m);
+                await this.sendMessage(m.chat, {
+                    text: result
+                }, {
+                    quoted: m
+                });
             }
-      } else if (text.startsWith('off')) {
-        this.autogpt.status = false;
-        await this.reply(m.chat, `*Chatgpt OFF*`, m);
-      }
+        }
     } catch {
-      await this.reply(m.chat, 'Error occurred.', m);
+        await this.reply(m.chat, 'Error occurred.', m);
     }
-  }
 }
+
+export const disabled = false;
+
 
 async function gptGo(query) {
     const encodeQuery = encodeURIComponent(query)
