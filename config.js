@@ -37,7 +37,7 @@ global.APIs = {
 /*Apikey*/
 global.APIKeys = {
     "https://api.neoxr.my.id": "5VC9rvNx",
-    "https://api.lolhuman.xyz": pickRandom(["043c5de3b7cd6b1b8f2a0f90", "e1a815979e6adfc071b7eafc", "ed78c137a46873c5b8e5fe3b", "IchanZX"]),
+    "https://api.lolhuman.xyz": pickRandom(["043c5de3b7cd6b1b8f2a0f90", "e1a815979e6adfc071b7eafc", "ed78c137a46873c5b8e5fe3b", "IchanZX", "GataDios"]),
     "https://api.xteam.xyz": "HIRO",
     "https://api.xyroinee.xyz": "yqiBQF86F4",
     "https://api.zeks.xyz": "apivinz",
@@ -49,7 +49,7 @@ global.APIKeys = {
 }
 
 /*Lolhuman*/
-global.lolkey = pickRandom(["043c5de3b7cd6b1b8f2a0f90", "e1a815979e6adfc071b7eafc", "ed78c137a46873c5b8e5fe3b", "IchanZX"])
+global.lolkey = pickRandom(["043c5de3b7cd6b1b8f2a0f90", "e1a815979e6adfc071b7eafc", "ed78c137a46873c5b8e5fe3b", "IchanZX", "GataDios"])
 /*OpenAi*/
 global.openaikey = "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"
 /*AmeApi*/
