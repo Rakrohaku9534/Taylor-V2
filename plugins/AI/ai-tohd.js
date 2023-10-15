@@ -11,7 +11,7 @@ if (!mime) throw 'Send Foto Dengan Caption .tohd'
 m.reply(wait)
 let media = await q.download()
 let url = await uploadFile(media)
-let hasil = await (await fetch(`https://api.xyroinee.xyz/api/ai/remini?url=${url}&apikey=${global.xyro}`)).buffer()
+let hasil = `https://api.xyroinee.xyz/api/ai/remini?url=${url}&apikey=${global.xyro}`
 await conn.sendFile(m.chat, hasil, '', '_Nih Kak Hasilnya_', m)
 	
 }
