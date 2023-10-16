@@ -9,7 +9,7 @@ let handler = async (m, {
     text,
     args
 }) => {
-    const input_data = await prodia.getModels();
+    const input_data = await prodia.getSDmodels();
 
     let [urutan, tema] = text.split("|")
     if (!tema) return m.reply("Input query!\n*Example:*\n.txt2img [nomor]|[query]")
@@ -27,8 +27,11 @@ let handler = async (m, {
 
         const generateImageParams = {
             prompt: encodeURIComponent(tema),
-            model: out,
-            upscale: true
+        model: out,
+        sampler: "DPM++ SDE Karras",
+        cfg_scale: 9,
+        steps: 30,
+        aspect_ratio: "portrait"
         };
         const openAIResponse = await generateImage(generateImageParams);
 

@@ -12,7 +12,7 @@ let handler = async (m, {
     text,
     args
 }) => {
-    const input_data = await prodia.getModels();
+    const input_data = await prodia.getSDmodels();
     
     let q = m.quoted ? m.quoted : m
     let mime = (q.msg || q).mimetype || ''
@@ -36,10 +36,14 @@ let handler = async (m, {
         let out = data[urutan - 1].id
 
         const generateImageParams = {
-            prompt: encodeURIComponent(tema),
-            upscale: true,
             imageUrl: link,
-        model: out
+        prompt: encodeURIComponent(tema),
+        model: out,
+        sampler: "DPM++ SDE Karras",
+        cfg_scale: 9,
+        steps: 30,
+        width: 512,
+        height: 768
         };
         const openAIResponse = await generateImage(generateImageParams);
 

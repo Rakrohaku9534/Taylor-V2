@@ -12,7 +12,19 @@ let handler = async (m, {
     text,
     args
 }) => {
-    const input_data = ["control_v11p_sd15_canny [d14c016b]"];
+    const input_data = [
+"control_v11p_sd15_canny [d14c016b]",
+"control_v11p_sd15_openpose [cab727d4]",
+"control_v11p_sd15_softedge [a8575a2a]",
+"control_v11p_sd15_scribble [d4ba51ff]"
+];
+
+const input_dataa = [
+"canny",
+"openpose",
+"softedge",
+"scribble"
+];
     
     let q = m.quoted ? m.quoted : m
     let mime = (q.msg || q).mimetype || ''
@@ -34,14 +46,14 @@ let handler = async (m, {
         if (isNaN(urutan)) return m.reply("Input query!\n*Example:*\n.controlnet [nomor]|[query]\n\n*Pilih angka yg ada*\n" + data.map((item, index) => `*${index + 1}.* ${item.title}`).join("\n"))
         if (urutan > data.length) return m.reply("Input query!\n*Example:*\n.controlnet [nomor]|[query]\n\n*Pilih angka yg ada*\n" + data.map((item, index) => `*${index + 1}.* ${item.title}`).join("\n"))
         let out = data[urutan - 1].id
+        let outt = input_dataa[urutan - 1]
 
         const generateImageParams = {
-            prompt: encodeURIComponent(tema),
-            upscale: true,
-            imageUrl: link,
-        cnModel: out,
-        cnModule: "canny",
-        sampler: "DDIM",
+            controlnet_model: out,
+        controlnet_module: outt,
+        imageUrl: link,
+        prompt: encodeURIComponent(tema),
+        cfg_scale: 10
         };
         const openAIResponse = await generateImage(generateImageParams);
 

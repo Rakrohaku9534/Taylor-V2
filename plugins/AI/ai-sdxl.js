@@ -9,7 +9,7 @@ let handler = async (m, {
     text,
     args
 }) => {
-    const input_data = ["dreamshaperXL10_alpha2.safetensors [c8afe2ef]"];
+    const input_data = await prodia.getSDXLmodels();
 
     let [urutan, tema] = text.split("|")
     if (!tema) return m.reply("Input query!\n*Example:*\n.sdxl [nomor]|[query]")
@@ -26,9 +26,11 @@ let handler = async (m, {
         let out = data[urutan - 1].id
 
         const generateImageParams = {
-            prompt: encodeURIComponent(tema),
             model: out,
-            upscale: true
+        prompt: encodeURIComponent(tema),
+        sampler: "DPM++ 2M Karras",
+        cfg_scale: 9,
+        steps: 30
         };
         const openAIResponse = await generateImage(generateImageParams);
 
@@ -58,7 +60,7 @@ handler.command = /^(sdxl)$/i
 export default handler
 
 async function generateImage(params) {
-    const generate = await prodia.sdxl(params);
+    const generate = await prodia.SDXL(params);
 
     while (generate.status !== "succeeded" && generate.status !== "failed") {
         await new Promise((resolve) => setTimeout(resolve, 250));
