@@ -1,79 +1,51 @@
-let handler = async (m, { conn, args, usedPrefix, command }) => {
+let handler = async (m, { conn, args }) => {
   const groupId = m.chat;
-  switch (command) {
-    case "acc":
-      const subCommand = args[0];
+  const [subCommand, options] = args;
+  const joinRequestList = await conn.groupRequestParticipantsList(groupId);
 
-      switch (subCommand) {
-        case "list":
-          try {
-            const joinRequestList = await conn.groupRequestParticipantsList(groupId);
-            if (joinRequestList.length > 0) {
-              const formattedList = joinRequestList.map(request => {
-                return `*JID:* ${request.jid}\n*Metode Permintaan:* ${request.request_method}\n*Waktu Permintaan:* ${new Date(request.request_time * 1000).toLocaleString()}\n`;
-              });
-              await m.reply("*Daftar Permintaan Bergabung:*\n" + formattedList.join("\n"));
-            } else {
-              await m.reply("Tidak ada permintaan bergabung yang tertunda.");
-            }
-          } catch (error) {
-            console.error(error);
-            await m.reply("Terjadi kesalahan saat mendapatkan daftar permintaan bergabung.");
+  const formatDate = (timestamp) => new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(timestamp * 1000));
+  const reply = (text) => conn.reply(m.chat, text, m, adReplyS);
+
+  switch (subCommand) {
+    case "list":
+      const formattedList = joinRequestList.length > 0
+        ? joinRequestList.map((request, i) => `*${i + 1}.*\n• Nomor: ${request.jid.split('@')[0]}\n• Metode Permintaan: ${request.request_method}\n• Waktu Permintaan: ${formatDate(request.request_time)}\n\n`).join('')
+        : "Tidak ada permintaan bergabung yang tertunda.";
+      reply(`*Daftar Permintaan Bergabung:*\n\n${formattedList}`);
+      break;
+
+    case "reject":
+    case "approve":
+      if (options === "all") {
+        for (const request of joinRequestList) {
+          await conn.groupRequestParticipantsUpdate(groupId, [request.jid], subCommand);
+          console.log(`Meng-${subCommand} participant dengan JID: ${request.jid}`);
+        }
+        reply(`*${subCommand === 'approve' ? 'Menyetujui' : 'Menolak'} semua permintaan bergabung.*`);
+      } else {
+        const actions = options.split('|').map(action => action.trim());
+        const participants = actions.map(action => joinRequestList[parseInt(action) - 1]).filter(request => request);
+        if (participants.length > 0) {
+          let formattedResponse = '';
+          for (const request of participants) {
+            const response = await conn.groupRequestParticipantsUpdate(groupId, [request.jid], subCommand);
+            const status = response[0].status === 'success' ? 'Berhasil' : 'Gagal';
+            formattedResponse += `*${participants.indexOf(request) + 1}.*\n• Status: ${status}\n• Nomor: ${request.jid.split('@')[0]}\n\n`;
+            console.log(`Meng-${subCommand} participant dengan JID: ${request.jid}`);
           }
-          break;
-        case "approve":
-          const action = args[1];
-          const participants = [];
-
-          if (action === "all") {
-            try {
-              const joinRequestList = await conn.groupRequestParticipantsList(groupId);
-
-              if (joinRequestList.length > 0) {
-                const participants = joinRequestList.map(request => request.jid);
-                const response = await conn.groupRequestParticipantsUpdate(groupId, participants, "approve");
-                const formattedResponse = response.map(res => {
-                  return `*Status:* ${res.status}\n*JID:* ${res.jid}\n`;
-                });
-
-                await m.reply("Menyetujui Semua Permintaan Bergabung. *Respon:*\n" + formattedResponse.join("\n"));
-              } else {
-                await m.reply("Tidak ada permintaan bergabung yang tertunda untuk disetujui.");
-              }
-            } catch (error) {
-              console.error(error);
-              await m.reply("Terjadi kesalahan saat menyetujui semua permintaan bergabung.");
-            }
-          } else {
-            participants.push(action + '@s.whatsapp.net');
-            try {
-              const response = await conn.groupRequestParticipantsUpdate(groupId, participants, "approve");
-              await m.reply("Menyetujui Permintaan Bergabung. *Respon:*\n" + JSON.stringify(response));
-            } catch (error) {
-              console.error(error);
-              await m.reply("Terjadi kesalahan saat menyetujui permintaan bergabung.");
-            }
-          }
-          break;
-        case "reject":
-          try {
-            const response = await conn.groupRequestParticipantsUpdate(groupId, [], "reject");
-            await m.reply("Menolak Permintaan Bergabung. *Respon:*\n" + JSON.stringify(response));
-          } catch (error) {
-            console.error(error);
-            await m.reply("Terjadi kesalahan saat menolak permintaan bergabung.");
-          }
-          break;
-        default:
-          await m.reply("Perintah tidak valid. Gunakan 'acc list', 'acc approve number', 'acc approve all', atau 'acc reject'.");
+          reply(`*${subCommand === 'approve' ? 'Menyetujui' : 'Menolak'} Permintaan Bergabung:*\n\n${formattedResponse}`);
+        } else {
+          reply("Tidak ada anggota yang cocok untuk reject/approve.");
+        }
       }
       break;
+
     default:
-      await m.reply("Perintah tidak valid. Gunakan 'acc list', 'acc approve number', 'acc approve all', atau 'acc reject'.");
+      reply("Perintah tidak valid. Gunakan *acc list*, *acc approve [number]*, *acc reject [number]*, *acc reject [JID]*, *acc reject/approve all* untuk menolak/menyetujui semua permintaan bergabung.");
   }
 }
 
-handler.help = ['acc *[option] [all/member]*']
+handler.help = ['acc *option*']
 handler.tags = ['group']
 handler.command = /^(acc)$/i
 handler.group = true
