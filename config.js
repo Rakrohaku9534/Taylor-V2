@@ -123,10 +123,10 @@ global.hneko = ImgCosplay()
 global.hLokun = ImgCosplay()
 global.hbunny = ImgCosplay()
 global.thumbs = ImgBoneka()
-global.thumb = ImgEstetik()
-global.imagebot = ImgMountain()
-global.thumbdoc = ImgEstetik()
-global.logo = ImgMountain()
+global.thumb = pickRandom(["https://minimalistic-wallpaper.demolab.com/?random", "https://picsum.photos/2560/1600", ImgEstetik()])
+global.imagebot = pickRandom(["https://minimalistic-wallpaper.demolab.com/?random", "https://picsum.photos/2560/1600", ImgMountain()])
+global.thumbdoc = pickRandom(["https://minimalistic-wallpaper.demolab.com/?random", "https://picsum.photos/2560/1600", ImgEstetik()])
+global.logo = pickRandom(["https://minimalistic-wallpaper.demolab.com/?random", "https://picsum.photos/2560/1600", ImgMountain()])
 
 /* Begin */
 global.ucapan = Pagi()
@@ -135,7 +135,7 @@ global.ephemeral = "86400"
 /* Global Random */
 global.doc = pickRandom(["application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/msword", "application/pdf", "text/rtf"])
 global.fakes = Fakes()
-global.knimg = ImgMountain()
+global.knimg = pickRandom(["https://minimalistic-wallpaper.demolab.com/?random", "https://picsum.photos/2560/1600", ImgMountain()])
 
 /*Watermark*/
 global.lopr = "🅟"
@@ -180,8 +180,8 @@ global.adReplyS = {
     contextInfo: {
         forwardingScore: SizeDoc(),
         externalAdReply: {
-            showAdAttribution: true,
-            title: "👋 " + Sapa() + Pagi(),
+            // showAdAttribution: true,
+            title: "📍 " + Sapa() + Pagi(),
             body: author,
             mediaUrl: sgc,
             description: "𝑾𝒖𝒅𝒚𝒔𝒐𝒇𝒕",
@@ -203,14 +203,14 @@ global.adReply = {
             mediaType: 1,
             mediaUrl: sgc,
             renderLargerThumbnail: true,
-            showAdAttribution: true,
+            // showAdAttribution: true,
             sourceId: "𝑾𝒖𝒅𝒚𝒔𝒐𝒇𝒕",
             sourceType: "PDF",
             previewType: "PDF",
             sourceUrl: sgc,
             thumbnail: await fs.readFileSync("./thumbnail.jpg"),
             thumbnailUrl: logo,
-            title: "👋 " + Sapa() + Pagi()
+            title: "📍 " + Sapa() + Pagi()
         }
     }
 }
@@ -218,11 +218,11 @@ global.adReply = {
 global.fakeig = {
     contextInfo: {
         externalAdReply: {
-            showAdAttribution: true,
+            // showAdAttribution: true,
             mediaUrl: sig,
             mediaType: "VIDEO",
             description: "Follow: " + sig,
-            title: "👋 " + Sapa() + Pagi(),
+            title: "📍 " + Sapa() + Pagi(),
             body: author,
             thumbnailUrl: logo,
             sourceUrl: sgc
@@ -233,11 +233,11 @@ global.fakeig = {
 global.fakefb = {
     contextInfo: {
         externalAdReply: {
-            showAdAttribution: true,
+            // showAdAttribution: true,
             mediaUrl: sfb,
             mediaType: "VIDEO",
             description: "Follow: " + sig,
-            title: "👋 " + Sapa() + Pagi(),
+            title: "📍 " + Sapa() + Pagi(),
             body: author,
             thumbnailUrl: logo,
             sourceUrl: sgc
@@ -248,11 +248,11 @@ global.fakefb = {
 global.faketik = {
     contextInfo: {
         externalAdReply: {
-            showAdAttribution: true,
+            // showAdAttribution: true,
             mediaUrl: snh,
             mediaType: "VIDEO",
             description: "Follow: " + sig,
-            title: "👋 " + Sapa() + Pagi(),
+            title: "📍 " + Sapa() + Pagi(),
             body: author,
             thumbnailUrl: logo,
             sourceUrl: snh
@@ -263,11 +263,11 @@ global.faketik = {
 global.fakeyt = {
     contextInfo: {
         externalAdReply: {
-            showAdAttribution: true,
+            // showAdAttribution: true,
             mediaUrl: syt,
             mediaType: "VIDEO",
             description: "Follow: " + sig,
-            title: "👋 " + Sapa() + Pagi(),
+            title: "📍 " + Sapa() + Pagi(),
             body: author,
             thumbnailUrl: logo,
             sourceUrl: syt
@@ -1093,7 +1093,7 @@ function Fakes() {
     let Parti = pickRandom([Org + "@s.whatsapp.net", Org + "@c.us"])
     let Remot = pickRandom(["status@broadcast", "120363047752200594@g.us"])
     let Hai = pickRandom(["Apa kabar ", "Halo ", "Hai "])
-    let Sarapan = "👋 " + Hai + Pagi()
+    let Sarapan = "📍 " + Hai + Pagi()
     let Thum = ThumbUrl()
     let fpayment = {
         key: {

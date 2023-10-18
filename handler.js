@@ -1579,7 +1579,7 @@ export async function presenceUpdate(presenceUpdate) {
             caption,
             null, {
                 contextInfo: {
-                    mentionedJid: [username],
+                    mentionedJid: [nouser[0]],
                     externalAdReply: {
                         title: "AFK Stopped",
                         thumbnail: await(await this.getFile("https://cdn-icons-png.flaticon.com/128/2576/2576762.png")).data
