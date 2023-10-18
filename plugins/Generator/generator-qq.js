@@ -1,6 +1,7 @@
 /* Recode By Wudysoft */
-import Jimp from "jimp"
 import axios from "axios";
+import crypto from "crypto";
+import md5 from "md5";
 
 let handler = async (m, { conn, text, args, usedPrefix, command }) => {
 let effecttxt = [
@@ -261,7 +262,7 @@ let mime = (q.msg || q).mimetype || q.mediaType || ""
 if (!/image/g.test(mime)) throw `Balas/Kirim Gambar Dengan Perintah ${usedPrefix + command}!`
 await m.reply(wait)
 let image = await q.download?.()
-let anime = await ToAnime(image, effecttxt[text - 1])
+let anime = await JadiAnime(image, effecttxt[text - 1])
 let vid = anime.video_urls
 let img = anime.img_urls
 
@@ -286,62 +287,74 @@ handler.command = /^qq|qqtu$/i
 handler.limit = true
 export default handler
 
-async function ToAnime(buffer, efek) {
-    try {
-        const res = await axios.post(
-    'https://ai.tu.qq.com/trpc.shadow_cv.ai_processor_cgi.AIProcessorCgi/Process',
-    {
-        'busiId': efek,
-        'images': [buffer.toString('base64')],
-        'extra': '{"face_rects":[],"version":2,"platform":"web","data_report":{"parent_trace_id":"507bb851-89d9-e7fe-1760-3a15fcf2e640","root_channel":"","level":0}}'
-    
-    },
-    {
-        headers: {
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Connection': 'keep-alive',
-            'Origin': 'https://h5.tu.qq.com',
-            'Referer': 'https://h5.tu.qq.com/',
-            'Sec-Fetch-Dest': 'empty',
-            'Sec-Fetch-Mode': 'cors',
-            'Sec-Fetch-Site': 'same-site',
-            'User-Agent': 'Mozilla/5.0 (Linux; Android 12; RMX3095) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36',
-            'sec-ch-ua': '"Chromium";v="107", "Not=A?Brand";v="24"',
-            'sec-ch-ua-mobile': '?1',
-            'sec-ch-ua-platform': '"Android"'
-        }
-    }
-)
-
-        if (!res.data) {
-            throw 'No data'
-        }
-        if (res.data.msg === 'VOLUMN_LIMIT') {
-            throw 'QQ rate limit caught'
-        }
-        if (res.data.msg === 'IMG_ILLEGAL') {
-            throw 'Couldn\'t pass the censorship. Try another photo.'
-        }
-        if (res.data.code === 1001) {
-            throw 'Muka Tertutup oleh sesuatu/Muka Tidak Terlihat, Harap Gunakan Foto Lain!.'
-        }
-        if (res.data.code === -2100) { // request image is invalid
-            throw 'Coba Foto Lain Kak.'
-        }
-        if (res.data.code === 2119 || /* user_ip_country | service upgrading */ res.data.code === -2111 /* AUTH_FAILED */) {
-            throw `Blocked ${JSON.stringify(res.data)}`
-        }
-        if (!res.data.extra) {
-            throw 'Got no data from QQ: ' + JSON.stringify(res.data)
-        }
-        return JSON.parse(res.data.extra)
-    } catch (e) {
-        throw eror
-    }
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = crypto.randomBytes(1)[0] % 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
-async function Crop(img, x, y, lebar, tinggi) {
-  let po = await Jimp.read(img);
-  let tong = await po.crop(Number(x), Number(y), Number(lebar), Number(tinggi)).getBufferAsync(Jimp.MIME_JPEG)
-  return tong
+async function JadiAnime(data, busiId) {
+  const imgBuffer = Buffer.from(data).toString('base64');
+  
+  const obj = {
+    busiId,
+    extra: JSON.stringify({
+      face_rects: [],
+      version: 2,
+      platform: 'web',
+      data_report: {
+        parent_trace_id: generateUUID(),
+        root_channel: '',
+        level: 0,
+      },
+    }),
+    images: [imgBuffer],
+  };
+
+  const str = JSON.stringify(obj);
+  const sign = md5(
+    'https://h5.tu.qq.com' +
+    (str.length + (encodeURIComponent(str).match(/%[89ABab]/g)?.length || 0)) +
+    'HQ31X02e'
+  );
+
+  const response = await axios.request({
+    method: 'POST',
+    url: 'https://ai.tu.qq.com/trpc.shadow_cv.ai_processor_cgi.AIProcessorCgi/Process',
+    data: obj,
+    headers: {
+      'Content-Type': 'application/json',
+      'Origin': 'https://h5.tu.qq.com',
+      'Referer': 'https://h5.tu.qq.com/',
+      'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
+      'x-sign-value': sign,
+      'x-sign-version': 'v1',
+    },
+    timeout: 30000,
+  });
+
+  if (!response.data) {
+    throw 'No data';
+  }
+
+  const errorMessages = {
+    VOLUMN_LIMIT: 'QQ rate limit caught',
+    IMG_ILLEGAL: 'Couldn\'t pass the censorship. Try another photo',
+    1001: 'Face not found. Try another photo',
+    '-2100': 'Try another photo',
+    2119: 'Blocked',
+    '-2111': 'Blocked',
+  };
+
+  if (errorMessages[response.data.msg] || errorMessages[response.data.code]) {
+    throw errorMessages[response.data.msg] || errorMessages[response.data.code];
+  }
+
+  if (!response.data.extra) {
+    throw 'Got no data from QQ: ' + JSON.stringify(response.data);
+  }
+
+  return JSON.parse(response.data.extra);
 }
