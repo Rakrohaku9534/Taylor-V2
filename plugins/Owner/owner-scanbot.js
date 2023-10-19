@@ -79,7 +79,7 @@ const config = {
             global.tryConnect(true)
             m.reply('Connecting...')
         } else if(connection === 'open'){
-        	conns.reply(m.chat, `Berhasil Tersambung dengan WhatsApp mu.\n*NOTE: Elu Cuma Numpang Akowkwow*\nNomor: ${conn.user.jid.split`@`[0]}\nJoin: ${timestamp}\n`, m)
+        	conns.reply(m.chat, `Berhasil Tersambung dengan WhatsApp mu.\n*NOTE: Cuma Numpang!*\nNomor: ${conn.user.jid.split`@`[0]}\nJoin: ${timestamp}\n`, m)
             global.tryConnect[m.sender] = 0
             global.conns[m.sender] = conn
         } else if(connection === 'close'){
