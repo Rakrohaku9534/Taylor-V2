@@ -74,7 +74,7 @@ let handler = async (m, { conn, args, usedPrefix, command, isOwner }) => {
         printQRInTerminal: true,
         auth: state,
         logger: P({ level: 'silent'}),
-        browser: ["Mystic-SerBot", "Safari", "5.0"],
+        browser: ['Chrome (Linux)', '', ''],
       }
 
       let conn = makeWaSocket(connectionOptions)
