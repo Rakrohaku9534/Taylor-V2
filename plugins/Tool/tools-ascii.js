@@ -15,13 +15,12 @@ let handler = async (m, {
     await m.reply(wait)
     try {
         let data = Object.keys(input_data).map(title => ({
-            title,
-            id: input_data[title]
+            title: input_data[title]
         }));
         if (!urutan) return m.reply("Input query!\n*Example:*\n.ascii [nomor]|[query]\n\n*Pilih angka yg ada*\n" + data.map((item, index) => `*${index + 1}.* ${item.title}`).join("\n"))
         if (isNaN(urutan)) return m.reply("Input query!\n*Example:*\n.ascii [nomor]|[query]\n\n*Pilih angka yg ada*\n" + data.map((item, index) => `*${index + 1}.* ${item.title}`).join("\n"))
         if (urutan > data.length) return m.reply("Input query!\n*Example:*\n.ascii [nomor]|[query]\n\n*Pilih angka yg ada*\n" + data.map((item, index) => `*${index + 1}.* ${item.title}`).join("\n"))
-        let out = data[urutan - 1].id
+        let out = data[urutan - 1].title
 
         const openAIResponse = await ASCII(out, tema);
 
