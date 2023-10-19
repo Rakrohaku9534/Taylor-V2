@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { URLSearchParams } from 'url';
 
 let handler = async (m, {
     command,
@@ -11,21 +12,18 @@ let handler = async (m, {
     let q = m.quoted ? m.quoted : m
     let mime = (q.msg || q).mimetype || ''
     if (!mime) throw 'No media found'
-    let media = await q.download()
-    
+    let media = await q.download();
     await m.reply(wait)
     try {
-        const openAIResponse = await fetchAnimeData(media);
+        const Anim = await postData(media);
 
-        if (openAIResponse) {
-            const result = openAIResponse;
+        if (Anim) {
+            
             const tag = `@${m.sender.split('@')[0]}`;
 
             await conn.sendMessage(m.chat, {
-                image: {
-                    url: result
-                },
-                caption: `Nih effect *photo-to-anime* nya\nRequest by: ${tag}`,
+                image: await(await conn.getFile(Anim)).data,
+                caption: `Nih effect *img-to-anime* nya\nRequest by: ${tag}`,
                 mentions: [m.sender]
             }, {
                 quoted: m
@@ -37,24 +35,22 @@ let handler = async (m, {
         await m.reply(eror)
     }
 }
-handler.help = ["jadianime"].map(v => v + " (Balas foto)")
+handler.help = ["img2anim"].map(v => v + " (Balas foto)")
 handler.tags = ["tools"]
-handler.command = /^(jadianime)$/i
+handler.command = /^(img2anim)$/i
 handler.limit = true
 export default handler
 
-async function fetchAnimeData(imageBuffer) {
+async function postData(imageBuffer) {
   const api = "https://api.taoanhdep.com/public/anime.php";
   const base64String = imageBuffer.toString('base64');
-  const body = new URLSearchParams();
-  body.set('image', base64String);
+
+  const params = new URLSearchParams({ image: base64String });
 
   const response = await fetch(api, {
-    headers: {
-      "content-type": "application/x-www-form-urlencoded",
-    },
-    body: body.toString(),
     method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body: params.toString(),
   });
 
   const data = await response.json();
