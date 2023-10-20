@@ -8,7 +8,7 @@ export async function before(m) {
         this.bomb = this.bomb ? this.bomb : {};
 
         let isSurrender = /^((me)?nyerah|surr?ender)$/i.test(m.text);
-        if (isSurrender) {
+        if (isSurrender && this.bomb && (id in this.bomb)) {
             await this.reply(m.chat, `🚩 Menyerah`, m);
             clearTimeout(this.bomb[id][2]);
             delete this.bomb[id];
