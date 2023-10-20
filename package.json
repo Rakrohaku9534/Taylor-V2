@@ -50,6 +50,7 @@
         "@xct007/frieren-scraper": "*",
         "@xct007/tiktok-scraper": "*",
         "acrcloud": "*",
+        "aki-api": "*",
         "amethyste-api": "*",
         "api-dylux": "*",
         "aptoide-scraper": "*",
