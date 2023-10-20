@@ -6,22 +6,25 @@ let handler = async (m, {
     usedPrefix,
     command
 }) => {
+
     let lister = [
         "v1",
         "v2",
         "v3",
         "v4",
         "v5",
-        "v6"
+        "v6",
+        "v7"
     ];
 
-    let [feature, inputs] = text.split(" ");
-    if (!lister.includes(feature.toLowerCase())) return m.reply(`*Contoh:*\n${usedPrefix + command} v2 link\n\n*Pilih jenis yang ada:*\n${lister.map(v => "  ○ " + v.toUpperCase()).join("\n")}`);
-
+    let [inputs, feature] = text.split(" ");
+    let msg = `Masukkan tautan yang valid\n\n*Contoh:*\n${usedPrefix + command} link v2\n\n*Pilih versi yang ada:*\n${lister.map(v => "  ○ " + v.toUpperCase()).join("\n")}`
     let LinkReg = /https?:\/\//.test(inputs) ? inputs : "https://" + inputs;
-    if (!LinkReg) return m.reply("Masukkan tautan yang valid");
-
-    m.reply(wait);
+    if (!(text && inputs && LinkReg)) return m.reply(msg);
+    feature = feature || "v5"
+    if (!lister.includes(feature.toLowerCase())) return m.reply(msg);
+    await conn.sendReact(m.chat, "⏳", m.key);
+    await m.reply(wait);
     try {
         let res;
         switch (feature) {
@@ -44,10 +47,22 @@ let handler = async (m, {
             case "v6":
                 res = await ssweb2(LinkReg);
                 break;
+                case "v7":
+                res = `https://mini.s-shot.ru/2560x1600/PNG/2560/Z100/?${LinkReg}`;
+                break;
         }
-        await conn.sendFile(m.chat, res, "", `*Request:* ${m.name}`, m);
+       
+            await conn.sendMessage(m.chat, {
+                image: { url: res },
+                caption: `*SCREENSHOT*\n- ${LinkReg}\n\n*Request:*\n- @${m.sender.split('@')[0]}`,
+                mentions: [m.sender]
+            }, {
+                quoted: m
+            });
+            await conn.sendReact(m.chat, "✅", m.key)
     } catch (e) {
-        throw e;
+    await conn.sendReact(m.chat, "❌", m.key)
+        await m.reply(eror);
     }
 };
 
