@@ -66,6 +66,20 @@ export async function before(m) {
         if (/^\S+(\s|[\W])\S+$/.test(txt)) {
             if (this.chessgame[m.chat].turn === this.chessgame[m.chat].player2) {
                 const chess = new Chess(this.chessgame[m.chat].fen);
+                if (chess.isCheckmate()) {
+      delete this.chessgame[m.chat]
+      await this.reply(m.chat, `⚠️ *Game Checkmate.*\n🏳️ *Permainan catur dihentikan.*\n*Pemenang:* @${m.sender.split('@')[0]}`, m, {
+        contextInfo: {
+          mentionedJid: [m.sender]
+        }
+      });
+      return;
+    }
+    if (chess.isDraw()) {
+      delete this.chessgame[m.chat]
+      await this.reply(m.chat, `⚠️ *Game Draw.*\n🏳️ *Permainan catur dihentikan.`, m);
+      return;
+    }
                 const [from, to] = txt.split(' ');
 
                 if (m.sender !== this.chessgame[m.chat].player2) {
