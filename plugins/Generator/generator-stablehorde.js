@@ -1,54 +1,58 @@
-import { getStatusModels, generateImage } from '../../lib/stablehorde.js';
+const { StableHorde } = await (await import('../../lib/stablehorde.js'));
+const apiKey = "0000000000";
+const stableHorde = new StableHorde(apiKey);
 
-const handler = async (m, { conn, args }) => {
-  const input = args.join(' ');
-  if (!input) {
-    return conn.reply(m.chat, `
-❌ Mohon berikan efek yang diinginkan dan pesanan.
-Contoh: *stablehorde efek|objek1|objek2*`, m);
+let handler = async (m, {
+  command,
+  usedPrefix,
+  conn,
+  text,
+  args
+}) => {
+  const input_data = ["text", "image"];
+  let [urutan, tema, queer] = text.split("|");
+  urutan = parseInt(urutan);
+  tema = parseInt(tema);
+
+  if (isNaN(urutan) || urutan < 1 || urutan > input_data.length) {
+    const validInputList = input_data.map((item, index) => `${index + 1}. ${item}`).join('\n');
+    return m.reply(`Nomor yang Anda masukkan tidak valid. Harap pilih nomor antara 1 dan ${input_data.length}:\n${validInputList}`);
   }
 
-  conn.reply(m.chat, '⌛ Sedang memproses permintaan...', m);
-
-  const [order, ...objects] = input.split('|');
-  if (!order) {
-    const searchResults = await getStatusModels();
-    const itemsList = searchResults.map((result, i) => `${i + 1}. ${result.name} (${((result.performance / Math.max(...searchResults.map(item => item.performance))) * 100).toFixed(2)}%)`).join('\n');
-    return conn.reply(m.chat, `
-❌ Mohon berikan nomor urutan yang valid.
-Pilihan yang tersedia:
-${itemsList}
-Contoh: *stablehorde 1|objek1|objek2*`, m);
+  let out = input_data[urutan - 1];
+  if (out == "text") {
+    const textModels = await stableHorde.textModels();
+    if (isNaN(tema) || tema < 1 || tema > textModels.length) {
+      const validTemaList = textModels.map((item, index) => `${index + 1}. ${item}`).join('\n');
+      return m.reply(`Nomor yang Anda masukkan tidak valid. Harap pilih nomor antara 1 dan ${textModels.length}:\n${validTemaList}`);
+    }
+    const model = textModels[tema - 1];
+    const prompt = queer;
+    try {
+      const generatedText = await stableHorde.generateText(prompt, model);
+      await m.reply(generatedText);
+    } catch (e) {
+      return m.reply("Terjadi kesalahan saat menghasilkan teks.");
+    }
+  } else if (out == "image") {
+    const imageModels = await stableHorde.imageModels();
+    const sortedNames = imageModels.sort((a, b) => b.performance - a.performance).map(item => item.name);
+    if (isNaN(tema) || tema < 1 || tema > sortedNames.length) {
+      const validTemaList = sortedNames.map((item, index) => `${index + 1}. ${item}`).join('\n');
+      return m.reply(`Nomor yang Anda masukkan tidak valid. Harap pilih nomor antara 1 dan ${sortedNames.length}:\n${validTemaList}`);
+    }
+    const model = sortedNames[tema - 1];
+    const prompt = queer;
+    try {
+      const generatedImageURL = await stableHorde.generateImage(model, prompt);
+      await conn.sendFile(m.chat, generatedImageURL, '', '', m);
+    } catch (e) {
+      return m.reply("Terjadi kesalahan saat menghasilkan gambar.");
+    }
   }
+}
 
-  const searchResults = await getStatusModels();
-  if (isNaN(order) || order <= 0 || order > searchResults.length) {
-    const itemsList = searchResults.map((result, i) => `${i + 1}. ${result.name} (${((result.performance / Math.max(...searchResults.map(item => item.performance))) * 100).toFixed(2)}%)`).join('\n');
-    return conn.reply(m.chat, `
-❌ Format urutan tidak valid atau urutan di luar jangkauan. Mohon berikan urutan yang valid.
-Pilihan yang tersedia:
-${itemsList}
-Contoh: *stablehorde 1|objek1|objek2*`, m);
-  }
-
-  const selectedResult = searchResults[order - 1];
-  const stablehordeResult = await generateImage(selectedResult.name, objects);
-  const tag = `@${m.sender.split('@')[0]}`;
-
-  if (stablehordeResult) {
-    conn.reply(m.chat, '✅ Sukses! Mengirimkan hasil...', m);
-    await conn.sendMessage(m.chat, {
-      image: { url: stablehordeResult },
-      caption: `Inilah efek *${selectedResult.name}*\nDipesan oleh: ${tag}`,
-      mentions: [m.sender]
-    }, { quoted: m });
-  } else {
-    conn.reply(m.chat, '❌ Maaf, terjadi kesalahan saat menghasilkan gambar. Silakan coba lagi nanti.', m);
-  }
-};
-
-handler.help = ['stablehorde <efek> <teks>'];
-handler.tags = ['maker'];
-handler.command = /^(stablehorde)$/i;
-
+handler.help = ["horde *[nomor]|[query]*"];
+handler.tags = ["generator"];
+handler.command = /^(horde)$/i;
 export default handler;
