@@ -8,7 +8,6 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         let txt = text.replace('@' + who.split`@`[0], '').trim();
         if (!txt) throw `where the number of days?`;
         if (isNaN(txt)) return m.reply(`only number!\n\nexample:\n${usedPrefix + command} @${m.sender.split`@`[0]} 7`);
-            global.prems = Object.keys(global.db.data.users).filter(key => global.db.data.users[key].premium);
         var jumlahHari = 86400000 * txt;
         var now = Date.now();
 
@@ -16,7 +15,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         else user.premiumTime = now + jumlahHari;
 
         user.premium = true;
-
+        global.prems = Object.keys(global.db.data.users).filter(key => global.db.data.users[key].premium);
+        
         m.reply(`✔️ Success
 📛 *Name:* ${user.name}
 📆 *Days:* ${txt} days
