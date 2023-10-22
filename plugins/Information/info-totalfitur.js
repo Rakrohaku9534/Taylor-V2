@@ -1,12 +1,24 @@
-
 let handler = async (m, { conn, text, usedPrefix, command }) => {
-const tags = Object.values(global.plugins)
-  .flatMap(p => p.help ? p.tags : [])
-  .filter(tag => tag != undefined && tag.trim() !== '');
-const counts = tags.reduce((c, tag) => (c[tag] = -~c[tag], c), {});
-await conn.reply(m.chat, `*[ FRACTION LIST ]*\n\n${Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([tag, count]) => `⭔ *${tag.charAt(0).toUpperCase() + tag.slice(1)}:* ${count} fitur`).join('\n')}\n\n*Total fitur:${Object.values(counts).reduce((a, b) => a + b, 0)} Commands*`, m, adReply);
+  const tags = Object.values(global.plugins)
+    .flatMap(p => p.help ? p.tags : [])
+    .filter(tag => tag != undefined && tag.trim() !== '');
+
+  const counts = tags.reduce((c, tag) => {
+    c[tag] = (c[tag] || 0) + 1;
+    return c;
+  }, {});
+
+  const tagList = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([tag, count]) => `⭔ ${(tag.charAt(0).toUpperCase() + tag.slice(1)).padEnd(13)} - ${count.toString().padStart(3)}`)
+    .join('\n');
+
+  const totalCommands = Object.values(counts).reduce((a, b) => a + b, 0);
+  const responseText = "```" + `${tagList}\n` + "```";
+
+  await conn.reply(m.chat, `*[ FEATURE LIST ]*\n\n${responseText}\n\n*Total fitur: ${totalCommands} Commands*`, m, adReply);
 }
 handler.help = ['totalfitur']
-handler.tags = ['main','info']
+handler.tags = ['main', 'info']
 handler.command = /^(feature|totalfitur)$/i
 export default handler
