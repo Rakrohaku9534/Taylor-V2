@@ -140,39 +140,6 @@ ${xc}`
 m.reply(caption)
 }
 
-if (command == 'calc') {
-let id = m.chat
-  conn.math = conn.math ? conn.math : {}
-  if (id in conn.math) {
-    clearTimeout(conn.math[id][3])
-    delete conn.math[id]
-    m.reply('Hmmm...ngecheat?')
-  }
-  let val = text
-    .replace(/[^0-9\-\/+*×÷πEe()piPI/]/g, '')
-    .replace(/×/g, '*')
-    .replace(/÷/g, '/')
-    .replace(/π|pi/gi, 'Math.PI')
-    .replace(/e/gi, 'Math.E')
-    .replace(/\/+/g, '/')
-    .replace(/\++/g, '+')
-    .replace(/-+/g, '-')
-  let format = val
-    .replace(/Math\.PI/g, 'π')
-    .replace(/Math\.E/g, 'e')
-    .replace(/\//g, '÷')
-    .replace(/\*×/g, '×')
-  try {
-    console.log(val)
-    let result = (new Function('return ' + val))()
-    if (!result) throw result
-    m.reply(`*${format}* = ${result}`)
-  } catch (e) {
-    if (e == undefined) throw 'Isinya?'
-    throw 'Format salah, hanya 0-9 dan Simbol -, +, *, /, ×, ÷, π, e, (, ) yang disupport'
-  }
-  }
-
 if (command == 'dlytmp3') {
   if (!text) throw 'Url Mana?'
 let f = await fetch(`https://api.webraku.xyz/api/ytmp3?url=${text}&apikey=Nathan`)
@@ -218,7 +185,7 @@ await conn.sendFile(m.chat, res, 'image.png', "Your Text: \n" + one + " " + two,
 
 
 }
-handler.command = handler.help = ['cdnjs', 'readqr', 'scanqr', 'animechan', 'whatanime', 'isgd', 'resmush', 'toascii', 'calc', 'dlytmp3', 'dlytmp4', 'mcskin']
+handler.command = handler.help = ['cdnjs', 'readqr', 'scanqr', 'animechan', 'whatanime', 'isgd', 'resmush', 'toascii', 'dlytmp3', 'dlytmp4', 'mcskin']
 handler.tags = ['tools']
 
 export default handler
