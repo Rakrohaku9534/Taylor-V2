@@ -63,7 +63,7 @@ const handler = async (m, { conn, args, usedPrefix, text, command }) => {
 };
 
 handler.help = ['stickertele [query]', 'stickertelegram [query]|[angka]', 'telesticker [query]|all', 'telegramsticker [query]|random'];
-handler.tags = ['stiker'];
+handler.tags = ['sticker'];
 handler.command = /^(stickertele(gram)?|telesticker|telegramsticker)$/i;
 handler.limit = 1;
 
