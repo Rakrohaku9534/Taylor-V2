@@ -111,7 +111,7 @@ ${res.sections[1].footer}
   
   
 }
-handler.tags = ["shazam"]
+handler.tags = ["tools"]
 handler.help = ["shazam <args> |query"]
 handler.command = ["shazam"]
 export default handler

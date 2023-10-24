@@ -19,7 +19,7 @@ let handler = async (m, { conn, text, usedPrefix, command: cmd }) => {
 }
 
 handler.help = ['WhatsappStalk']
-handler.tags = ['stalker']
+handler.tags = ['tools']
 handler.command = /^(wa|whatsapp)stalk$/i
 
 export default handler
