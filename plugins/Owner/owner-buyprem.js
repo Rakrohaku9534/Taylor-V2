@@ -86,7 +86,7 @@ handler.before = async (m, { conn }) => {
 };
 
 handler.help = ["buyprem"];
-handler.tags = ["utama"];
+handler.tags = ["owner"];
 handler.command = /^buyprem$/i;
 
 export default handler;

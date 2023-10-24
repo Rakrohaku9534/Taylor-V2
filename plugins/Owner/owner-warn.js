@@ -16,7 +16,7 @@ let handler = async (m, { conn, args, usedPrefix }) => {
     } else conn.reply(m.chat, '*Siapa yang mau di Warn?*', m)
 }
 handler.help = ['warn @tag']
-handler.tags = ['owner', 'moderator']
+handler.tags = ['owner']
 handler.command = /^warn$/i
 handler.mods = true
 
