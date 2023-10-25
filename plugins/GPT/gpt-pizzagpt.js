@@ -30,40 +30,15 @@ handler.command = /^(pizzagpt)$/i
 export default handler
 
 /* New Line */
-async function pizzaKey() {
-  const sourceResponse = await fetch("https://www.pizzagpt.it/", {
-    method: "GET",
-    headers: {
-      "Referer": "www.pizzagpt.it"
-    }
-  });
-  const sourceText = await sourceResponse.text();
-  const reqJS = sourceText.match("index.*?\.js")[0];
-
-  const response = await fetch("https://www.pizzagpt.it/_nuxt/" + reqJS.trim(), {
-    method: "GET",
-    headers: {
-      "Referer": "www.pizzagpt.it"
-    }
-  });
-  const respText = await response.text();
-  const pizzaSecret = respText.match("x=\"(.*?)\"")[1];
-
-  return pizzaSecret;
-}
-
-// axiosHelper.js
-const keySecret = await pizzaKey()
+ async function pizzaGpt(messages) {
 const headers = {
   'Origin': 'https://pizzagpt.it',
   'Referer': 'https://pizzagpt.it/',
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
-  'X-Secret': keySecret || 'Marinara',
+  'X-Secret': 'Marinara',
   'Content-Type': 'text/plain;charset=UTF-8',
   'Cookie': 'dntd=false; cf_clearance=r4xzN9B6NS2nW5gq2Q1YOgiYw1zu3xs81FmZyNjSVBg-1690797483-0-0.2.1690797483; n-req=1'
 };
-
- async function pizzaGpt(messages) {
   let conversation = 'This is a conversation between a human and a language model. The language model should always respond as the assistant, referring to the past history of messages if needed.\n';
 
   for (const message of messages) {
