@@ -1153,6 +1153,7 @@ export async function handler(chatUpdate) {
                         name != "./plugins/Owner/owner-exec.js" &&
                         name != "./plugins/Owner/owner-exec2.js" &&
                         name != "./plugins/Owner/tools-delete.js" &&
+                        name != "./plugins/Others/enable.js" &&
                         chat?.isBanned
                     )
                         return // Except this
