@@ -16,7 +16,7 @@ const handler = async (m, {
         text = m.quoted.text
     } else throw msg;
     
-    await m.reply(wait);
+    await conn.reply(m.chat, wait, m);
     
     try {
         const data = await dlPanda(text);
@@ -34,7 +34,7 @@ const handler = async (m, {
             }
         }
     } catch (error) {
-        throw eror
+        await conn.reply(m.chat, eror, m);
     }
 };
 

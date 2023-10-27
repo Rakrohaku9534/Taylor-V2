@@ -12,25 +12,24 @@ let handler = async (m, {
         if (text.match(/(https:\/\/sfile.mobi\/)/gi)) {
             let res = await sfileDl(text)
             if (!res) throw 'Error :/'
-            let caption = `🔍 *[ RESULT ]*\n\n📁 *Filename:* ${res.filename}\n📦 *Filesize:* ${res.filesize}\n📎 *Mimetype:* ${res.mimetype}\n⬇️ *Download:* ${res.download}`
+            let caption = `- *[ RESULT ]*\n\n- *Name:* ${res.name}\n- *Author:* ${res.author}\n- *Mimetype:* ${res.mimeType}\n- *Description:* ${res.description}\n`
             await m.reply(caption + '\n\n' + wait)
-            conn.sendMessage(m.chat, {
-                document: {
-                    url: res.download
-                },
-                fileName: res.filename,
-                mimetype: res.mimetype
+            const { data } = await(await conn.getFile(res.downloadLink));
+            await conn.sendMessage(m.chat, {
+                document: data,
+                fileName: res.name,
+                mimetype: res.mimeType
             }, {
                 quoted: m
             })
         } else if (text) {
             let [query, page] = text.split`|`
             let res = await sfileSearch(query, page)
-            if (!res.length) throw `Query "${text}" not found :/`
-            let teks = res.map((v, index) => {
-                return `🔍 *[ RESULT ${index + 1} ]*\n\n📚 *Title:* ${v.title}\n📏 *Size:* ${v.size}\n🔗 *Link:* ${v.link}`
+            if (!res.result.length) throw `Query "${text}" not found :/`
+            let teks = res.result.map((v, index) => {
+                return `- *[ RESULT ${index + 1} ]*\n\n- *Name:* ${v.name}\n- *Size:* ${v.size}\n- *Link:* ${v.link}`
             }).filter(v => v).join("\n\n________________________\n\n")
-            await m.reply(teks)
+            await m.reply(teks + "\n*Total:*" + res.total)
         } else throw 'Input Query / Sfile Url!'
     } catch (e) {
         m.reply(eror)
@@ -43,33 +42,50 @@ handler.command = /^sfile(d(own(load)?|l))?$/i
 export default handler
 
 async function sfileSearch(query, page = 1) {
-    let res = await fetch(`https://sfile.mobi/search.php?q=${query}&page=${page}`)
-    let $ = cheerio.load(await res.text())
-    let result = []
-    $('div.list').each(function() {
-        let title = $(this).find('a').text()
-        let size = $(this).text().trim().split('(')[1]
-        let link = $(this).find('a').attr('href')
-        if (link) result.push({
-            title,
-            size: size.replace(')', ''),
-            link
-        })
-    })
-    return result
+    try {
+    const response = await fetch(`https://sfile.mobi/search.php?q=${query}&page=${page}`);
+    const html = await response.text();
+    const $ = cheerio.load(html);
+    const result = $('.list').map((index, element) => {
+      const text = $(element).text();
+      const nameMatch = $(element).find('a').text();
+      const link = $(element).find('a').attr('href');
+      const sizeMatch = text.match(/\((.*?)\)/);
+      const size = sizeMatch ? sizeMatch[1] : '';
+      return { name: nameMatch, link, size };
+    }).get().filter(item => item.name);
+    return {
+      total: result.length,
+      result,
+    };
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function sfileDl(url) {
-    let res = await fetch(url)
-    let $ = cheerio.load(await res.text())
-    let filename = $('div.w3-row-padding').find('img').attr('alt')
-    let mimetype = $('div.list').text().split(' - ')[1].split('\n')[0]
-    let filesize = $('#download').text().replace(/Download File/g, '').replace(/\(|\)/g, '').trim()
-    let download = $('#download').attr('href') + '&k=' + Math.floor(Math.random() * (15 - 10 + 1) + 10)
-    return {
-        filename,
-        filesize,
-        mimetype,
-        download
-    }
+    try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to fetch the URL: ${response.statusText}`);
+    const html = await response.text();
+    const $ = cheerio.load(html);
+    const match = /'(\w{32})';/.exec($('a#download').attr('onclick'));
+    if (!match) throw new Error('Download parameter not found in the onclick attribute');
+    const downloadLink = $('.w3-center #download').attr('href') || '';
+    const mimeType = $('.list svg.icon-file-code-o')
+      .parent()
+      .text()
+      .slice(2)
+      .trim();
+    const result = {
+      mimeType,
+      name: $('h1.intro').text().trim(),
+      author: $('svg.icon-user-o').next().text().trim(),
+      description: $('.list:last').text().trim(),
+      downloadLink: downloadLink + "&k=" + match[1]
+    };
+    return result;
+  } catch (error) {
+    throw error;
+  }
 }
