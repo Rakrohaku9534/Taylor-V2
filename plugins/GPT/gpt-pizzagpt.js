@@ -1,6 +1,5 @@
 import cheerio from 'cheerio';
 import fetch from 'node-fetch';
-import axios from 'axios';
 
 let handler = async (m, {
     conn,
@@ -9,20 +8,14 @@ let handler = async (m, {
     text,
     command
 }) => {
-if (!text) return m.reply("Input query\nExample: .pizzagpt hello")
-await m.reply(wait)
-try {
-
-const messages = [
-  { role: 'user', content: text },
-  { role: 'assistant', content: 'Saya baik, terima kasih. Ada yang bisa saya bantu?' }
-];
-
-  const result = await pizzaGpt(messages);
-  await m.reply(result);
-} catch (e) {
-await m.reply(eror)
-}
+    if (!text) return m.reply("Input query\nExample: .pizzagpt hello")
+    await m.reply(wait)
+    try {
+        let result = await pizzagpt(text)
+        await m.reply(result)
+    } catch (e) {
+        await m.reply(eror)
+    }
 }
 handler.help = ["pizzagpt"]
 handler.tags = ["internet", "ai", "gpt"];
@@ -30,30 +23,60 @@ handler.command = /^(pizzagpt)$/i
 export default handler
 
 /* New Line */
- async function pizzaGpt(messages) {
-const headers = {
-  'Origin': 'https://pizzagpt.it',
-  'Referer': 'https://pizzagpt.it/',
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
-  'X-Secret': 'Marinara',
-  'Content-Type': 'text/plain;charset=UTF-8',
-  'Cookie': 'dntd=false; cf_clearance=r4xzN9B6NS2nW5gq2Q1YOgiYw1zu3xs81FmZyNjSVBg-1690797483-0-0.2.1690797483; n-req=1'
-};
-  let conversation = 'This is a conversation between a human and a language model. The language model should always respond as the assistant, referring to the past history of messages if needed.\n';
+async function pizzagpt(query) {
+    const messages = [{
+            role: 'system',
+            content: 'You are a helpful assistant.'
+        },
+        {
+            role: 'user',
+            content: query
+        },
+    ];
+    const json_data = {
+        messages: messages,
+        model: "gpt-3.5-turbo",
+        temperature: 0.9,
+        presence_penalty: 0,
+        top_p: 1,
+        frequency_penalty: 0,
+        stream: true,
+    };
 
-  for (const message of messages) {
-    conversation += `${message.role}: ${message.content}\n`;
-  }
+    const data = JSON.stringify(json_data);
 
-  conversation += 'assistant: ';
-  const jsonData = {
-    question: conversation
-  };
+    const headers = {
+        'authority': 'ai.fakeopen.com',
+        'accept': '*/*',
+        'accept-language': 'en,fr-FR;q=0.9,fr;q=0.8,es-ES;q=0.7,es;q=0.6,en-US;q=0.5,am;q=0.4,de;q=0.3',
+        'authorization': 'Bearer pk-this-is-a-real-free-pool-token-for-everyone',
+        'content-type': 'application/json',
+        'origin': 'https://chat.geekgpt.org',
+        'referer': 'https://chat.geekgpt.org/',
+        'sec-ch-ua': '"Chromium";v="118", "Google Chrome";v="118", "Not=A?Brand";v="99"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"macOS"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'cross-site',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36',
+    };
 
-  const response = await axios.post('https://pizzagpt.it/api/chat-completion', jsonData, {
-    headers: headers,
-    impersonate: 'chrome110'
-  });
+    const response = await fetch("https://ai.fakeopen.com/v1/chat/completions", {
+        method: 'POST',
+        headers: headers,
+        body: data,
+    });
 
-  return response.data.answer.content;
+
+    const result = (await response.text())
+        .split('\n')
+        .filter(line => line.trim() !== '')
+        .map(line => line.replace('data: ', ''))
+        .slice(0, -2)
+        .map(item => JSON.parse(item))
+        .map(v => v.choices[0].delta.content)
+        .join('');
+
+    return result;
 }
