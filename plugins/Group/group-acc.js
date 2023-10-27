@@ -29,7 +29,7 @@ let handler = async (m, { conn, args }) => {
           let formattedResponse = '';
           for (const request of participants) {
             const response = await conn.groupRequestParticipantsUpdate(groupId, [request.jid], subCommand);
-            const status = response[0].status === 'success' ? 'Berhasil' : 'Gagal';
+            const status = response[0].status === 'success' ? 'Gagal' : 'Berhasil';
             formattedResponse += `*${participants.indexOf(request) + 1}.*\n• Status: ${status}\n• Nomor: ${request.jid.split('@')[0]}\n\n`;
             console.log(`Meng-${subCommand} participant dengan JID: ${request.jid}`);
           }
@@ -41,7 +41,7 @@ let handler = async (m, { conn, args }) => {
       break;
 
     default:
-      reply("Perintah tidak valid. Gunakan *acc list*, *acc approve [number]*, *acc reject [number]*, *acc reject [JID]*, *acc reject/approve all* untuk menolak/menyetujui semua permintaan bergabung.");
+      reply("*Perintah tidak valid.*\nGunakan:\n- *acc list*\n- *acc approve [number]*\n- *acc reject [number]*\n- *acc reject [JID]*\n- *acc reject/approve all* untuk menolak/menyetujui semua permintaan bergabung.");
   }
 }
 
