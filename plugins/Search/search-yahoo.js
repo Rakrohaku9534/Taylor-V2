@@ -19,21 +19,21 @@ let handler = async (m, {
 
         await m.reply(wait)
 
-        if (command === "yandex") {
+        if (command === "yahoo") {
             const param = {
                 api_key: 'f70cce2ec221209bcd45af4533adbbc51c51b682c29251b618061115c6e95d5c',
-                engine: 'yandex',
-                text: text
+                engine: 'yahoo',
+                p: text
             };
             let all = await generateSerpApiUrl(param)
             let caption = all.organic_results.map((v, index) => `${htki + " " + ++index + " " + htka}\n*${v.title || 'Tidak terdeteksi'}*\n  *○ Link:* ${v.link || 'Tidak terdeteksi'}\n  *○ Snippet:* ${v.snippet || 'Tidak terdeteksi'}`).join("\n\n")
             await conn.reply(m.chat, caption, m)
         }
-        if (command === "yandeximg") {
+        if (command === "yahooimg") {
             const param = {
                 api_key: 'f70cce2ec221209bcd45af4533adbbc51c51b682c29251b618061115c6e95d5c',
-                engine: 'yandex_images',
-                text: text
+                engine: 'yahoo_images',
+                p: text
             };
             let all = await generateSerpApiUrl(param)
             let caption = all.images_results[0]
@@ -47,19 +47,19 @@ let handler = async (m, {
                 quoted: m
             });
         }
-        if (command === "yandexvid") {
+        if (command === "yahoovid") {
             const param = {
                 api_key: 'f70cce2ec221209bcd45af4533adbbc51c51b682c29251b618061115c6e95d5c',
-                engine: 'yandex_videos',
-                text: text
+                engine: 'yahoo_videos',
+                p: text
             };
             let all = await generateSerpApiUrl(param)
             let caption = all.videos_results[0]
             await conn.sendMessage(m.chat, {
                 video: {
-                    url: caption.preview.url || caption.thumbnail
+                    url: caption.preview || caption.thumbnail
                 },
-                caption: `- ${caption.title}\n- ${caption.description}\n- ${caption.duration}\n- ${caption.source}\n- ${caption.date}\n- ${caption.views}`,
+                caption: `- ${caption.title}\n- ${caption.duration}\n- ${caption.source}\n- ${caption.date}`,
                 mentions: [m.sender]
             }, {
                 quoted: m
@@ -70,7 +70,7 @@ let handler = async (m, {
         // Handle the error, e.g., send an error message to the user
     }
 }
-handler.help = ["yandex *[img/vid query]*"]
+handler.help = ["yahoo *[img/vid query]*"]
 handler.tags = ["search"]
-handler.command = /^yandex(img|vid)?$/i
+handler.command = /^yahoo(img|vid)?$/i
 export default handler
