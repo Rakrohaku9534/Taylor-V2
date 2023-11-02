@@ -1,7 +1,7 @@
 const {
     generatePlayUrl,
     regexPattern
-} = await (await import('../../lib/dodstream.js'));
+} = await (await import('../../lib/doodstream.js'));
 
 const handler = async (m, {
     conn,
@@ -25,10 +25,10 @@ const handler = async (m, {
 
     try {
         const playUrl = await generatePlayUrl(inputText);
-        await m.reply("- *Stream:*\n" + playUrl);
+        return m.reply("- *Stream:*\n" + playUrl);
     } catch (error) {
         console.error(error);
-        await m.reply('Terjadi kesalahan saat mengunduh video. Silakan coba lagi nanti.');
+        return m.reply('Terjadi kesalahan saat mengunduh video. Silakan coba lagi nanti.');
     }
 };
 handler.help = ["xstream"];
