@@ -95,6 +95,7 @@
         "javascript-obfuscator": "*",
         "jimp": "*",
         "jsdom": "*",
+        "js-beautify": "*",
         "link-preview-js": "*",
         "lodash": "*",
         "lowdb": "^3.0.0",
