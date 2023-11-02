@@ -21,7 +21,7 @@ let handler = async (m, {
 
         if (command === "yandex") {
             const param = {
-                api_key: 'f70cce2ec221209bcd45af4533adbbc51c51b682c29251b618061115c6e95d5c',
+                api_key: 'd52da17da557f02e45234c11db22c4e9fe19c15d68a378e0a31f11d92b2cf562',
                 engine: 'yandex',
                 text: text
             };
@@ -31,7 +31,7 @@ let handler = async (m, {
         }
         if (command === "yandeximg") {
             const param = {
-                api_key: 'f70cce2ec221209bcd45af4533adbbc51c51b682c29251b618061115c6e95d5c',
+                api_key: 'd52da17da557f02e45234c11db22c4e9fe19c15d68a378e0a31f11d92b2cf562',
                 engine: 'yandex_images',
                 text: text
             };
@@ -49,7 +49,7 @@ let handler = async (m, {
         }
         if (command === "yandexvid") {
             const param = {
-                api_key: 'f70cce2ec221209bcd45af4533adbbc51c51b682c29251b618061115c6e95d5c',
+                api_key: 'd52da17da557f02e45234c11db22c4e9fe19c15d68a378e0a31f11d92b2cf562',
                 engine: 'yandex_videos',
                 text: text
             };
