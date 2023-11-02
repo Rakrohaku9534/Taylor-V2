@@ -20,7 +20,7 @@ try {
       { role: 'user', content: text },
     ];
 
-    const result = await fetchCompletion(MODEL_4, messages);
+    const result = await fetchCompletion(MODEL_3_5, messages);
     await m.reply(result);
 } catch (e) {
     try {
@@ -29,7 +29,7 @@ try {
           { role: 'user', content: text },
         ];
 
-        const result = await fetchCompletion(MODEL_4, messages, true); // Menambahkan argumen true untuk menandai penggunaan API kedua
+        const result = await fetchCompletion(MODEL_3_5, messages, true);
         await m.reply(result);
     } catch (error) {
         await m.reply(error);
