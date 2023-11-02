@@ -1,118 +1,129 @@
+import axios from 'axios';
+import cheerio from 'cheerio';
 
-import axios from "axios"
-import {
-    sticker
-} from "../../lib/sticker.js"
-import {
-    JSDOM
-} from "jsdom"
-import wibusoft from "wibusoft"
-
-let handler = async (m, {
+const handler = async (m, {
     conn,
-    args,
-    text,
-    usedPrefix,
-    command
+    args
 }) => {
-    let who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender
-    let name = await conn.getName(who)
-	let query = "input text\nEx. .flammingtext hello world\n<command> <tex>"
-	
-	let urut = text.split`|`
-  let one = urut[0]
-  let two = urut[1]
-  let three = urut[2]
-  
-  if (command == "flammingtheme") {
-  if (!one) throw "input query\nContoh:\n.flammingtext Fire|2"
-  if (!two) throw "input page"
-  let TEXT_STYLES = await searchImageUrl(one, two)
-  let listSections = []
-	Object.values(TEXT_STYLES).map((v, index) => {
-    let vendor = v.value
-	listSections.push(vendor)
-  })
-  var listnya = listSections.map((v, index) => { return `[ ${++index} ] ${v.split(/[\s/?]+/)[2]}` }).join('\n')
-  await m.reply("*L I S T - T E M A*\nContoh:\n.flammingtext Design-Fire|hello guys\n\n" + listnya)
-  }
-  
-  if (command == "flammingtext") {
-  if (!one) throw "input design\nContoh:\n.flammingtext Design-Fire|hello guys\nketik *.flammingtheme* query|page untuk mencari list tema"
-  if (!two) throw "input text"
-  await m.reply(wait)
-    let result = await getImageUrl(one, two)
-    try {
-        let out = await wibusoft.tools.makeSticker(result.image, {
-            author: packname,
-            pack: name,
-            keepScale: true
-        })
-        await m.reply(out)
-    } catch (e) {
-        let stick = await sticker(buffer, false, name, packname)
-        await conn.sendFile(m.chat, stick, "flammingtext.webp", "", m)
+    const input = args.join(' ');
+    if (!input) {
+        return conn.reply(m.chat,
+            `❌ Cara Penggunaan:\n` +
+            `1. Untuk menampilkan panduan penggunaan dan contoh, ketik: *flammingtext*\n` +
+            `2. Untuk menampilkan daftar urutan halaman dan contoh, ketik: *flammingtext [query]*\n` +
+            `3. Untuk menampilkan daftar indeks dan contoh, ketik: *flammingtext [query|page]*\n` +
+            `4. Untuk menampilkan hasil terpilih, ketik: *flammingtext [query|page|index]*`, m);
+
     }
-  }
-}
-handler.help = ["flammingtext"]
-handler.tags = ["misc"]
-handler.command = /^(flammingtext|flammingtheme)$/i
-export default handler
 
-async function getImageUrl(textStyleId, text) {
-  try {
-  var data = {
-    image: '',
-    status: false
-  }
-  var html = 'https://api.flamingtext.com/logo/' + textStyleId + '?_variations=true&text='
-  var loc = '&_loc=catdynamic'
-  var query = text
-  var client_uri = html + encodeURIComponent(query) + loc
-  var data_uri = await axios.get(client_uri)
-  var find_sc = data_uri.data.split('ft-justify-grid-item">')[2].split('href="')[1].split('" class')[0].replace('amp;', '')
-  var get_image = await axios.get('https://api.flamingtext.com' + find_sc)
-  var payload = get_image.data.split('alt="Image')[1].split('src="')[1].split('" />')[0]
-  
-  data.image = payload
-  data.status = true
-  return data;
-  } catch (e) {
-    console.error(e);
-    throw new Error("Something went wrong getting Word Art");
-  }
-}
+    const [query, pageStr, idxStr] = input.split('|');
 
-async function searchImageUrl(textStyle, page) {
-let res = await fetch('https://api.flamingtext.com/Cool-Text-Generator/page' + page + '?text=' + textStyle)
-    let html = await res.text()
-    let dom = new JSDOM(html)
-    
-// Mengambil semua elemen HTML
-let htmlCollection = dom.window.document.getElementsByTagName('a');
+    const page = parseInt(pageStr);
+    const idx = parseInt(idxStr);
 
-// Membuat array kosong untuk menampung hasil
-let jsonArray = [];
+    if (isNaN(page)) {
+        return conn.reply(m.chat,
+            '❌ Nomor halaman tidak valid. Silakan masukkan nomor halaman antara 1 dan 67.', m);
 
-// Melakukan looping melalui semua elemen HTML
-for (let i = 0; i < htmlCollection.length; i++) {
-// Mengambil tag dan nilai dari setiap elemen HTML
-if (htmlCollection[i].href.startsWith('/logo')) {
-let tagName = htmlCollection[i].tagName;
-let value = htmlCollection[i].href;
+    }
 
-// Membuat objek JSON untuk setiap elemen HTML
-let jsonObject = {
-tag: tagName,
-value: value
+    const searchResults = await getLogosByPage(query, page);
+
+    if (isNaN(idx)) {
+        const sortedTitles = searchResults.map((logo, index) => `*${index + 1}.* ${logo.title}`);
+        return conn.reply(m.chat,
+            `❌ Mohon berikan indeks. Contoh: *flammingtext ${query}|${page}|1*.\n\nHasil Pencarian:\n` + sortedTitles.join('\n'), m);
+
+    }
+
+    if (page < 1 || page > 67 || idx <= 0 || idx > searchResults.length) {
+        return conn.reply(m.chat,
+            '❌ Nomor halaman atau indeks tidak valid. Silakan periksa nomor halaman dan indeks yang dimasukkan.', m);
+
+    }
+
+    const selectedLogo = searchResults.find(logo => logo.page === page && logo.index === idx);
+
+    if (!selectedLogo) {
+        return conn.reply(m.chat,
+            '❌ Hasil tidak ditemukan. Pastikan nomor halaman dan indeks yang dimasukkan benar.', m);
+
+    }
+
+    if (selectedLogo) {
+        await conn.reply(m.chat,
+            `${wait}\n${selectedLogo.title}`, m);
+        const caption = `*Judul:* ${selectedLogo.title}\n*Link:* ${selectedLogo.link}`;
+        const tag = `@${m.sender.split('@')[0]}`;
+
+        try {
+            await conn.sendMessage(m.chat, {
+                image: await fetchArrayBufferToBuffer(selectedLogo.linkImage),
+                caption: `${caption}\nPermintaan oleh: ${tag}`,
+                mentions: [m.sender]
+            }, {
+                quoted: m
+            });
+        } catch (error) {
+            return conn.reply(m.chat, '❌ Terjadi Kesalahan: ' + error.message, m);
+
+        }
+    }
 };
 
-// Menambahkan objek JSON ke array JSON
-jsonArray.push(jsonObject);
-}
-}
+handler.help = ['flammingtext [query|page|index]'];
+handler.tags = ['pembuat'];
+handler.command = /^(flammingtext)$/i;
+export default handler;
 
-// Mengembalikan array JSON sebagai hasil akhir
-return jsonArray
+async function getLogosByPage(query, page) {
+    try {
+        if (page < 1 || page > 67) {
+            throw new Error('Nomor halaman tidak valid. Silakan masukkan nomor halaman antara 1 dan 67.');
+        }
+
+        const baseUrl = page === 1 ?
+            `https://api.flamingtext.com/All-Logos/?text=${query}` :
+            `https://api.flamingtext.com/All-Logos/page${page}?text=${query}`;
+
+        const {
+            data
+        } = await axios.get(baseUrl);
+        const $ = cheerio.load(data);
+
+        return $('.ft-logo').map((index, element) => {
+            const anchor = $(element).find('a');
+            const img = $(element).find('img');
+            const link = 'https://api.flamingtext.com' + anchor.attr('href');
+            const linkImage = 'https://api.flamingtext.com' + img.attr('logo-src');
+            const textParam = new URLSearchParams(linkImage.split('?')[1]).get('script');
+            const title = textParam ? textParam.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : '';
+
+            return {
+                title,
+                link,
+                linkImage,
+                page,
+                index: index + 1
+            };
+        }).get();
+    } catch (error) {
+        console.error('Terjadi kesalahan:', error.message);
+        return [];
+    }
+};
+
+async function fetchArrayBufferToBuffer(url) {
+    try {
+        const response = await axios.get(url, {
+            responseType: 'arraybuffer'
+        });
+
+        const arrayBuffer = response.data;
+        const buffer = Buffer.from(arrayBuffer);
+
+        return buffer;
+    } catch (error) {
+        console.error(error.message);
+    }
 }
