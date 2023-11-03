@@ -12,7 +12,7 @@ let handler = async (m, {
     let name = await conn.getName(who)
 
     if (command == "creator") {
-        let vcard = `BEGIN:VCARD\nVERSION:3.0\nN:WhatsApp;Saya Owner Taylor;Bot;;Md\nFN:Saya Owner Taylor Bot WhatsApp, Md\nNICKNAME:👑 Owner Taylor Bot\nORG:Wudy\nTITLE:soft\nitem1.TEL;waid=6282195322106:+62 821-9532-2106\nitem1.X-ABLabel:📞 Nomor Owner\nitem2.URL:https://s.id/Cerdasin62\nitem2.X-ABLabel:💬 More\nitem3.EMAIL;type=INTERNET:wudysoft@mail.com\nitem3.X-ABLabel:💌 Mail Owner TaylorBot\nitem4.ADR:;;🇮🇩 Indonesia;;;;\nitem4.X-ABADR:💬 More\nitem4.X-ABLabel:📍 Lokasi Saya\nBDAY;value=date:🔖 13 January 2001\nEND:VCARD`
+        let vcard = `BEGIN:VCARD\nVERSION:3.0\nN:WhatsApp;Saya Owner Taylor;Bot;;Md\nFN:Saya Owner Taylor Bot WhatsApp, Md\nNICKNAME:👑 Owner Taylor Bot\nORG:Fal\nTITLE:soft\nitem1.TEL;waid=6281916619735:+62 819-1661-9735\nitem1.X-ABLabel:📞 Nomor Owner\nitem2.URL:https://www.instagram.com/fahrul_mt\nitem2.X-ABLabel:💬 More\nitem3.EMAIL;type=INTERNET:rakrohaku@mail.com\nitem3.X-ABLabel:💌 Mail Owner TaylorBot\nitem4.ADR:;;🇮🇩 Indonesia;;;;\nitem4.X-ABADR:💬 More\nitem4.X-ABLabel:📍 Lokasi Saya\nBDAY;value=date:🔖 21 November 2006\nEND:VCARD`
         let tag_own = await conn.sendMessage(m.chat, {
             contacts: {
                 displayName: wm,
@@ -38,7 +38,7 @@ let handler = async (m, {
         })
     }
     if (command == "pengembang") {
-        let vcard = `BEGIN:VCARD\nVERSION:3.0\nN:;${author};;;\nFN:${author}\nORG:${author}\nTITLE:\nitem1.TEL;waid=6282195322106:+62 821-9532-2106\nitem1.X-ABLabel:${author}\nX-WA-BIZ-DESCRIPTION:${htjava} Nih pengembang ku kack yg mengaktifkan aq.\nX-WA-BIZ-NAME:${author}\nEND:VCARD`
+        let vcard = `BEGIN:VCARD\nVERSION:3.0\nN:;${author};;;\nFN:${author}\nORG:${author}\nTITLE:\nitem1.TEL;waid=6281916619735:+62 819-1661-9735\nitem1.X-ABLabel:${author}\nX-WA-BIZ-DESCRIPTION:${htjava} Nih pengembang ku kack yg mengaktifkan aq.\nX-WA-BIZ-NAME:${author}\nEND:VCARD`
         let tag_own = await conn.sendMessage(m.chat, {
             contacts: {
                 displayName: wm,
@@ -70,10 +70,10 @@ let handler = async (m, {
                 (await conn.getName(item[0] + "@s.whatsapp.net")) || "Tidak diketahui",
                 "👑 Owner",
                 ((await conn.fetchStatus(item[0] + "@s.whatsapp.net")).status) || "Tidak diketahui",
-                "wudysoft@gmail.com",
+                "rakrohaku@gmail.com",
                 "🇮🇩 Indonesia",
-                "🚀 https://aygemuy.github.io/",
-                "👤 Gada pawang nih senggol dong 😔"
+                "🚀 https://www.instagram.com/fahrul_mt",
+                "👤 Pemula 😔"
             ]);
 
             const data = await Promise.all(ownerPromises);
