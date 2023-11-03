@@ -11,10 +11,10 @@ import moment from "moment-timezone"
 
 /*Oᴡɴᴇʀ number*/
 global.owner = [
-    ["6282195322106", "️𝑾𝒖𝒅𝒚𝒔𝒐𝒇𝒕 - 𝑶𝒘𝒏𝒆𝒓", true]
+    ["6281916619735", "️𝑭𝒂𝒍 - 𝑶𝒘𝒏𝒆𝒓", true]
 ]
-global.mods = ["6282195322106"]
-global.prems = ["6282195322106"]
+global.mods = ["6281916619735"]
+global.prems = ["6281916619735"]
 
 /*Website*/
 global.APIs = {
@@ -58,10 +58,10 @@ global.ameapikey = "1f98ec7e4842d057d7551722f83e9ae5c59896856aa3f96d406ff8fc9185
 global.xyro = "yqiBQF86F4"
 
 /*Number*/
-global.nomorbot = "6285171216276"
-global.nomorown = "6282195322106"
+global.nomorbot = "6285712408309"
+global.nomorown = "6281916619735"
 global.namebot = " ᴛᴀyʟᴏʀ-ʙᴏᴛ あ⁩ "
-global.nameown = "「 𝑾𝒖𝒅𝒚𝒔𝒐𝒇𝒕 」"
+global.nameown = "「 𝑭𝒂𝒍 」"
 
 /* Random */
 global.pmenus = pickRandom(["乂", "◈", "➭", "ଓ", "⟆•", "⳻", "•", "↬", "◈", "⭑", "ᯬ", "◉", "᭻", "»", "〆", "々", "⛥", "✗", "⚜", "⚚", "♪"])
@@ -81,13 +81,13 @@ global.fla = pickRandom(ImgLogoFlam())
 global.flaaa = ImgLogoDynamic()
 
 /*Link*/
-global.sig = "https://www.instagram.com/wudysoft"
-global.sgh = "https://www.github.com/AyGemuy"
-global.sgc = "https://chat.whatsapp.com/LqJoQr4IdBLAXsxd1PkNph"
-global.sdc = "https://www.discord.com/wudysoft"
-global.snh = "https://www.tiktok.com/@upload_file"
-global.sfb = "https://www.facebook.com/"
-global.syt = "https://www.youtube.com/"
+global.sig = "https://www.instagram.com/fahrul_mt"
+global.sgh = "https://www.instagram.com/fahrul_mt"
+global.sgc = "https://www.instagram.com/fahrul_mt"
+global.sdc = "https://www.instagram.com/fahrul_mt"
+global.snh = "https://www.instagram.com/fahrul_mt"
+global.sfb = "https://www.instagram.com/fahrul_mt"
+global.syt = "https://www.instagram.com/fahrul_mt"
 
 /*Nsfw*/
 global.premnsfw = true
@@ -148,7 +148,7 @@ global.cmenua = "\n⌕ ❙❘❙❙❘❙❚❙❘❙❙❚❙❘❙❘❙❚❙
 global.emojis = pickRandom(["👑", "🎗", "️🗿", "🕹", "️💡", "🪄", "🎈", "🎊", "🔖", "📍", "❤", "‍🔥", "💤", "💭", "🕚", "💬", "🚩", "🎐", "🍃", "🌿", "🥀", "✨", "⚡", "☂️"])
 global.packname = "𝑴𝒂𝒅𝒆 𝒃𝒚"
 global.stickpack = packname
-global.author = "𝑻𝒂𝒚𝒍𝒐𝒓 乂 𝑾𝒖𝒅𝒚𝒔𝒐𝒇𝒕"
+global.author = "𝑻𝒂𝒚𝒍𝒐𝒓 乂 𝑭𝒂𝒍"
 global.stickauth = author + "\nwa.me/" + nomorbot
 global.multiplier = 69
 
@@ -156,22 +156,22 @@ global.multiplier = 69
 global.eror = "_💤 Ada yang eror nih!_"
 global.wait = "_🕚 Mohon tunggu, dalam proses!_"
 global.render = "_📍 Rendering!_"
-global.webs = "https://s.id/Cerdasin62"
-global.gcwangsaf = "https://chat.whatsapp.com/LqJoQr4IdBLAXsxd1PkNph"
+global.webs = "https://www.instagram.com/fahrul_mt"
+global.gcwangsaf = "https://www.instagram.com/fahrul_mt"
 
 /*Donasi*/
-global.saweria = "https://saweria.com/wudysoft"
-global.dana = "0887435373103"
-global.pulsa = "082195322106"
-global.trakteer = "https://trakteer.id/wudysoft"
-global.paypal = "wudysoft@mail.com"
-global.gopay = "082195322106"
-global.pdana = "0887435373103"
-global.povo = "082195322106"
-global.pgopay = "082195322106"
-global.ppulsa = "082195322106"
-global.ppulsa2 = "082195322106"
-global.psaweria = "https://saweria.com/Wudysoft"
+global.saweria = "-"
+global.dana = "085786539008"
+global.pulsa = "085786539008"
+global.trakteer = "-"
+global.paypal = "rakrohaku@mail.com"
+global.gopay = "085786539008"
+global.pdana = "085786539008"
+global.povo = "085786539008"
+global.pgopay = "085786539008"
+global.ppulsa = "085786539008"
+global.ppulsa2 = "085712408309"
+global.psaweria = "-"
 
 /* Fake adReplyS*/
 global.adReplyS = {
@@ -184,10 +184,10 @@ global.adReplyS = {
             title: "📍 " + Sapa() + Pagi(),
             body: author,
             mediaUrl: sgc,
-            description: "𝑾𝒖𝒅𝒚𝒔𝒐𝒇𝒕",
+            description: "𝑭𝒂𝒍",
             previewType: "PHOTO",
             thumbnail: await fs.readFileSync("./thumbnail.jpg"),
-            sourceUrl: "https://github.com/AyGemuy",
+            sourceUrl: "https://www.instagram.com/fahrul_mt",
         }
     }
 }
@@ -204,7 +204,7 @@ global.adReply = {
             mediaUrl: sgc,
             renderLargerThumbnail: true,
             // showAdAttribution: true,
-            sourceId: "𝑾𝒖𝒅𝒚𝒔𝒐𝒇𝒕",
+            sourceId: "𝑭𝒂𝒍",
             sourceType: "PDF",
             previewType: "PDF",
             sourceUrl: sgc,
@@ -1091,7 +1091,7 @@ function ThumbUrl() {
 function Fakes() {
     let Org = pickRandom(["0", "628561122343", "6288906250517", "6282195322106", "6281119568305", "6281282722861", "6282112790446"])
     let Parti = pickRandom([Org + "@s.whatsapp.net", Org + "@c.us"])
-    let Remot = pickRandom(["status@broadcast", "120363047752200594@g.us"])
+    let Remot = pickRandom(["status@broadcast", "120363164474799719@g.us"])
     let Hai = pickRandom(["Apa kabar ", "Halo ", "Hai "])
     let Sarapan = "📍 " + Hai + Pagi()
     let Thum = ThumbUrl()
