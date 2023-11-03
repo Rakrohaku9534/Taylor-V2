@@ -894,7 +894,7 @@ export async function handler(chatUpdate) {
             if (typeof chat !== "object")
                 global.db.data.chats[m.chat] = {}
             if (chat) {
-                if (!("antiDelete" in chat)) chat.antiDelete = true
+                if (!("antiDelete" in chat)) chat.antiDelete = false
                 if (!("antiLink" in chat)) chat.antiLink = false
                 if (!("viewStory" in chat)) chat.viewStory = false
                 if (!("antiSticker" in chat)) chat.antiSticker = false
@@ -917,11 +917,11 @@ export async function handler(chatUpdate) {
                 if (!("useDocument" in chat)) chat.useDocument = false
                 if (!("viewonce" in chat)) chat.viewonce = false
                 if (!("viewOnce" in chat)) chat.viewOnce = false
-                if (!("welcome" in chat)) chat.welcome = true
+                if (!("welcome" in chat)) chat.welcome = false
                 if (!isNumber(chat.expired)) chat.expired = 0
             } else
                 global.db.data.chats[m.chat] = {
-                    antiDelete: true,
+                    antiDelete: false,
                     antiLink: false,
                     viewStory: false,
                     antiSticker: false,
@@ -945,7 +945,7 @@ export async function handler(chatUpdate) {
                     useDocument: false,
                     viewOnce: false,
                     viewonce: false,
-                    welcome: true,
+                    welcome: false,
                 }
             let akinator = global.db.data.users[m.sender].akinator
             if (typeof akinator !== 'object')
